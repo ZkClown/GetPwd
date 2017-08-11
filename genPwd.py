@@ -10,24 +10,33 @@ def loadCsv(file):
 
     return res
 
+
+def getSmallDic(word, dictionary):
+    res = []
+    for i in word:
+        for j in dictionary:
+            if i in j:
+                res.append(j)
+    return res
+
 class word:
     def __init__(self, word):
         self.word = word
         self.done = []
 
-    def genWords(dictionary):
+    def genWords(dictionary, string, pos):
         res = ""
+        if len(string)<len(self.word):
+            for j in self.word[pos:]:
+                for i in dictionary:
+                    if j in i:
+                        for k in i:
+                            res = string + k
+                            bf(res,pos+1)
+                break
 
-
-
-
-
-
-
-        if self.checkExist(res) != 0:
-            self.genWords()
         else:
-            self.done.append(res)
+            self.done.append(string)
 
 
     def checkExist(string):
