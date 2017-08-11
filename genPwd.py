@@ -13,9 +13,10 @@ def loadCsv(file):
 
 def getSmallDic(word, dictionary):
     res = []
+    word = list(set(word.lower()))
     for i in word:
         for j in dictionary:
-            if i in j:
+            if i == j[0]:
                 res.append(j)
     return res
 
@@ -24,7 +25,7 @@ class word:
         self.word = word
         self.done = []
 
-    def genWords(dictionary, string, pos):
+    def genWords(self, dictionary, string, pos):
         res = ""
         if len(string)<len(self.word):
             for j in self.word[pos:]:
@@ -32,7 +33,7 @@ class word:
                     if j in i:
                         for k in i:
                             res = string + k
-                            bf(res,pos+1)
+                            self.genWords(dictionary,res,pos+1)
                 break
 
         else:
@@ -79,4 +80,9 @@ def checkInFile(string, file):
 
 
 if __name__=="__main__":
+    dico = loadCsv("leetTab.csv")
+    test = word("Alliacom")
+    smallDic = getSmallDic(test.word, dico)
+    test.genWords(smallDic, "" , 0)
+
     print("hi !")
