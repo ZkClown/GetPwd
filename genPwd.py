@@ -1,6 +1,15 @@
 import csv
 from threading import Thread
 
+def miniBf(string, list):
+    res = ""
+    dico = "abcdefghijklmnopqrstuvwxyz0123456789@&!:;,?./\\$*ù+-=%µ£€"
+    if len(string)<4:
+        for char in dico:
+            res = string + char
+            list.append(res)
+            miniBf(res, list)
+
 def loadCsv(file):
     res = []
     with open(file, newline='') as csvfile:
@@ -9,7 +18,6 @@ def loadCsv(file):
             res.append(i)
 
     return res
-
 
 def getSmallDic(word, dictionary):
     res = []
@@ -30,7 +38,7 @@ class word:
         if len(string)<len(self.word):
             for j in self.word[pos:]:
                 for i in dictionary:
-                    if j in i:
+                    if j.lower() == i[0]:
                         for k in i:
                             res = string + k
                             self.genWords(dictionary,res,pos+1)
@@ -46,10 +54,11 @@ class word:
         else:
             return 1
 
-def bfBegtoEnd(mot):
-
-
-    return res
+class date:
+    def __init__(self, date):
+        self.day = date.split('/')[0]
+        self.month = date.split('/')[1]
+        self.year = date.split('/')[2]
 
 def packing(list, file):
 
@@ -82,7 +91,9 @@ def checkInFile(string, file):
 if __name__=="__main__":
     dico = loadCsv("leetTab.csv")
     test = word("Alliacom")
-    smallDic = getSmallDic(test.word, dico)
-    test.genWords(smallDic, "" , 0)
+    testList = []
+    #smallDic = getSmallDic(test.word, dico)
+    #test.genWords(smallDic, "" , 0)
+    #print(test.done)
 
     print("hi !")
