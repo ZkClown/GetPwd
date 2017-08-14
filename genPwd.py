@@ -24,6 +24,19 @@ def threadLauncher(wordList,dictionary):
 
     return myWords
 
+def threadDateLauncher(dateList,dictionary):
+    myDates = []
+    temp = []
+    for dateInList in dateList:
+        myDates.append(date(dateInList))
+    for i in myDates:
+        temp.append(genDates(i, dictionary))
+    for thread in temp:
+        thread.start()
+    for thread in temp:
+        thread.join()
+
+    return myDates
 
 #Generate all possible strings from 1 char to 4 char (BF)
 def miniBf(string, list):
@@ -137,6 +150,16 @@ class genObjects(Thread):
     def run(self):
         self.word.genWords(self.dictionary, "", 0)
 
+class genDates(Thread):
+    def __init__(self, date, dictionary):
+        Thread.__init__(self)
+        self.word = date
+        self.dictionary = dictionary
+        super(genDates, self).__init__()
+
+    def run(self):
+        self.word.genDatesFormat(self.dictionary)
+
 #???? Is it usefull ????
 def checkInFile(string, file):
     if string in file:
@@ -157,7 +180,8 @@ if __name__=="__main__":
     wordList = []
     loadPersonalsDatas(loadCsv(args["file"], ";"), dateList, wordList)
     myWords = threadLauncher(wordList, dico)
-    for i in myWords:
+    myDates = threadDateLauncher(dateList, dicoMonth)
+    for i in myDates:
         print(i.done)
     myDates = []
     #test = word("Alliacom")
