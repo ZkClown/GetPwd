@@ -190,3 +190,7 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+
+#csvTest
+persoData.csv
