@@ -56,6 +56,8 @@ class date:
                 if int(self.day) < 9:
                     self.day = self.day.split(' ')
                     self.day.append(self.day[0][-1:])
+                else:
+                    self.day = self.day.split(' ')
             self.month = date.split('/')[1]
             self.year = [date.split('/')[2], date.split('/')[2][2:]]
         else:
@@ -88,6 +90,14 @@ class date:
             for x in temp2:
                 temp.append(x)
             for x in temp3:
+                temp.append(x)
+            temp4 = [self.day, self.month]
+            temp5 = [self.month, self.day]
+            temp4 = list(itertools.product(*temp4))
+            temp5 = list(itertools.product(*temp5))
+            for x in temp4:
+                temp.append(x)
+            for x in temp5:
                 temp.append(x)
         else:
             temp = [self.day, self.month]
@@ -124,28 +134,34 @@ class genDates(Thread):
         self.word.genDatesFormat(self.dictionary)
 
 class partCombine(Thread):
-    def __init__(self,list, begValue, end, index):
+    def __init__(self,list, begValue, end, index, diff, myWords, myDates):
         Thread.__init__(self)
         self.begValue = begValue
         self.end = end
         self.index = index
         self.list = list
+        self.diff = diff
+        self.myWords = myWords
+        self.myDates = myDates
         super(partCombine, self).__init__()
 
     def run(self):
-        packing(self.list, self.begValue, self.end, self.index)
+        packing(self.list, self.begValue, self.end, self.index, self.diff, self.myWords, self.myDates)
 
 class partCombNext(Thread):
-    def __init__(self,list, begValue, end, index):
+    def __init__(self,list, begValue, end, index, diff, myWords, myDates):
         Thread.__init__(self)
         self.begValue = begValue
         self.end = end
         self.index = index
         self.list = list
+        self.diff = diff
+        self.myWords = myWords
+        self.myDates = myDates
         super(partCombNext, self).__init__()
 
     def run(self):
-        packNext(self.list, self.begValue, self.end, self.index)
+        packNext(self.list, self.begValue, self.end, self.index, self.diff, self.myWords, self.myDates)
 
 #------------------------------------------------------------------------------------------#
 #----------------------------------Thread Launchers----------------------------------------#
@@ -177,45 +193,48 @@ def threadDateLauncher(dateList,dictionary):
 
     return myDates
 
-def threadCombiner(list):
+def threadCombiner(list, diff, myWords, myDates):
     initList(list)
     lastValue = 0
     threadNumber = 0
-    step = 100
+    step = int(len(list)/3)
     tmp = []
-    for i in range(0,len(list)):
+    for i in range(1,len(list)):
         if(i%step == 0):
-            tmp.append(partCombine(list, lastValue, i, threadNumber))
+            tmp.append(partCombine(list, lastValue, i, threadNumber, diff, myWords, myDates))
             lastValue = i
             threadNumber += 1
     if(lastValue!=len(list)):
-        tmp.append(partCombine(list, lastValue, len(list), threadNumber))
+        tmp.append(partCombine(list, lastValue, len(list), threadNumber, diff, myWords, myDates))
     for thread in tmp:
         thread.start()
     print("Fin lancement thread")
     for thread in tmp:
         thread.join()
+    print("Packing")
     os.system("cat ./buffer/*.txt > ./buffer/output && rm ./buffer/*.txt")
 
-def threadCombNext(list, rec):
-    for i in range(0,rec):
+def threadCombNext(list, rec, diff, myWords, myDates):
+
+    for j in range(1,rec):
         lastValue = 0
         threadNumber = 0
-        step = 200
+        step = int(len(list)/3)
         tmp = []
-        for i in range(0,len(list)):
+        for i in range(1,len(list)):
             if(i%step == 0):
-                tmp.append(partCombNext(list, lastValue, i, threadNumber))
+                tmp.append(partCombNext(list, lastValue, i, threadNumber, diff, myWords, myDates))
                 lastValue = i
                 threadNumber += 1
         if(lastValue!=len(list)):
-            tmp.append(partCombNext(list, lastValue, len(list), threadNumber))
+            tmp.append(partCombNext(list, lastValue, len(list), threadNumber, diff, myWords, myDates))
         for thread in tmp:
             thread.start()
         print("Fin lancement thread")
         for thread in tmp:
             thread.join()
-        os.system("cat ./buffer/*.txt > ./buffer/output"+str(i)+" && rm ./buffer/*.txt")
+        print("Packing")
+        os.system("cat ./buffer/*.txt > ./buffer/output"+str(j)+" && rm ./buffer/*.txt")
 
 
 #------------------------------------------------------------------------------------------#
@@ -224,7 +243,7 @@ def threadCombNext(list, rec):
 #----------------------------------Loading Csv---------------------------------------------#
 def loadDatesWithSeparators(myDates):
     res = []
-    separators = " -_/|"
+    separators = "-_/|"
     now = datetime.datetime.now()
     for date in myDates:
         for dateFormated in date.done:
@@ -295,21 +314,69 @@ def initList(list):
         file.write(word+"\n")
     file.close()
 
-def packing(list, start, end, index):
+def packing(list, start, end, index, diff , myWords, myDates):
+    flag = 0
     file = open("./buffer/"+str(index)+".txt","w")
     for i in range(start,end):
         for j in range(0,len(list)):
-            file.write(list[i]+list[j]+"\n")
-
+            if diff != 1:
+                file.write(list[i]+list[j]+"\n")
+            else:
+                if len(list[i].split('/')) != 1 and len(list[j].split('/')) != 1:
+                    for date in myDates:
+                        if list[i] in date.done and list[j] in date.done:
+                            flag = 1
+                            break
+                    if flag == 0:
+                        file.write(list[i]+list[j]+"\n")
+                    flag = 0
+                elif len(list[i].split('/')) == 1 and len(list[j].split('/')) == 1:
+                    for word in myWords:
+                        if list[i] in word.done and list[j] in word.done:
+                            flag = 1
+                            break
+                    if flag == 0:
+                        file.write(list[i]+list[j]+"\n")
+                    flag = 0
+                else:
+                    file.write(list[i]+list[j]+"\n")
     file.close()
 
-def packNext(list, start,end,index):
+def packNext(list, startValue,endValue,index, diff, myWords, myDates):
+    flag = 0
     file = open("./buffer/"+str(index)+".txt","w")
-    file2 = open("./buffer/output", "r")
-    for i in range(start,end):
+    for i in range(startValue, endValue):
+        file2 = open("./buffer/output", "r")
         for line in file2:
-            file.write(list[i]+line)
-    file2.close()
+            if diff != 1:
+                file.write(list[i]+line)
+            else:
+                if len(list[i].split('/')) != 1:
+                    for date in myDates:
+                        if list[i] in date.done:
+                            for x in date.done:
+                                if x in line:
+                                    flag = 1
+                                    break
+                            if flag == 1:
+                                break
+                    if flag == 0:
+                        file.write(list[i]+line)
+                    flag = 0
+                elif len(list[i].split('/')) == 1:
+                    for word in myWords:
+                        if list[i] in word.done:
+                            for x in word.done:
+                                if x in line:
+                                    flag = 1
+                                    break
+                            if flag == 1:
+                                break
+                    if flag == 0:
+                        file.write(list[i]+line)
+                    flag = 0
+        file2.close()
+
     file.close()
 
 
@@ -327,6 +394,7 @@ if __name__=="__main__":
     ap.add_argument("-f", "--file", required=True, help="file wich contains personals datas")
     ap.add_argument("-r", "--recurence", help="Number of iterations")
     ap.add_argument("-b", "--brute", help="Activate brute force, 1 to active")
+    ap.add_argument("-d", "--difference", help="Activate the re usage of a same info more than once, 1 to activate")
     arg = ap.parse_args()
     args = vars(ap.parse_args())
 
@@ -344,12 +412,25 @@ if __name__=="__main__":
     if arg.recurence:
         if args["recurence"] in "0123456789":
             if int(args["recurence"]) > 0:
-                threadCombiner(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage)
+                if args["difference"] == "1":
+                    if len(wordList+dateList+garbage) == 1:
+                        initList(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage)
+                    else:
+                        threadCombiner(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage, 1, myWords, myDates)
+                else:
+                    threadCombiner(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage, 0, [], [])
                 if int(args["recurence"]) > 1:
-                    threadCombNext(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage,int(args['recurence']))
+                    if args["difference"] == "1":
+                        if len(wordList+dateList+garbage) == 1:
+                            initList(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage)
+                        else:
+                            threadCombNext(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage,int(args['recurence']), 1, myWords, myDates)
+                    else:
+                        threadCombNext(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage,int(args['recurence']), 0, [], [])
+
     else:
         initList(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage)
     os.system("cat ./buffer/* > ./output.list && rm -f ./buffer/*")
-
+    print("DONE : dictionary -> output.list")
 
 #------------------------------------------------------------------------------------------#
