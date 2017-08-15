@@ -3,6 +3,21 @@ import itertools
 import argparse
 from threading import Thread
 
+def loadDatesWithSeparators(myDates):
+    res = []
+    separators = " -_/|"
+    for date in myDates:
+        for dateFormated in date.done:
+            if len(dateFormated) == 2:
+                for sep in separators:
+                    res.append(dateFormated[0]+sep+dateFormated[1])
+                res.append(dateFormated[0]+dateFormated[1])
+            else:
+                for sep in separators:
+                    res.append(dateFormated[0]+sep+dateFormated[1]+sep+dateFormated[2])
+                res.append(dateFormated[0]+dateFormated[1]+dateFormated[2])
+    return res
+
 def loadPersonalsDatas(dictionary, dateList, wordList): #dateList must be empty
     for entry in dictionary:
         if entry[0].count('/') > 0:
@@ -41,7 +56,7 @@ def threadDateLauncher(dateList,dictionary):
 #Generate all possible strings from 1 char to 4 char (BF)
 def miniBf(string, list):
     res = ""
-    dico = "abcdefghijklmnopqrstuvwxyz0123456789@&!:;,?./\\$*ù+-=%µ£€"
+    dico = "abcdefghijklmnopqrstuvwxyz0123456789@&!:;,?./\\$*ù+-_=%µ£€()[]|~#\{\}@^"
     if len(string)<4:
         for char in dico:
             res = string + char
@@ -130,14 +145,28 @@ class date:
                 temp.append(x)
         self.done = temp
 
-#Function to combines all our results from leet words and dates : TO DO
-def packing(list, file):
+#Function to combines all our results from leet words and dates : technically it works ... but use too much rssources
+def packing(myWords, myDates, garbage):
+    res = []
+    dates = loadDatesWithSeparators(myDates)
+    words = []
+    for word in myWords:
+        for done in word.done:
+            words.append(done)
+    #print(len(words))
+    temp = ["words","dates","garbage"]
+    iter2 = list(itertools.product(temp, repeat=2))
+    iter3 = list(itertools.product(temp, repeat=3))
+    iter4 = list(itertools.product(temp, repeat=4))
+    for i in iter2:
+        res.append(list(itertools.product(eval(i[0]),eval(i[1]))))
+    #    break
+    for i in iter3:
+        res.append(list(itertools.product(eval(i[0]),eval(i[1]),eval(i[2]))))
+    for i in iter3:
+        res.append(list(itertools.product(eval(i[0]),eval(i[1]),eval(i[2]),eval(i[3]))))
+    return res
 
-
-    if checkInFile(res) != 0:
-        packing(list, file)
-    else:
-        writeInFile(res)
 
 #Thread to generate leet for all words in personal infos
 class genObjects(Thread):
@@ -150,6 +179,7 @@ class genObjects(Thread):
     def run(self):
         self.word.genWords(self.dictionary, "", 0)
 
+#Thread to generate dates format for all dates
 class genDates(Thread):
     def __init__(self, date, dictionary):
         Thread.__init__(self)
@@ -181,12 +211,14 @@ if __name__=="__main__":
     loadPersonalsDatas(loadCsv(args["file"], ";"), dateList, wordList)
     myWords = threadLauncher(wordList, dico)
     myDates = threadDateLauncher(dateList, dicoMonth)
-    for i in myDates:
-        print(i.done)
-    myDates = []
+    garbage = ["1","2"]
+    print(loadDatesWithSeparators(myDates))
+    packing(myWords, myDates, garbage)
+    #miniBf("",garbage)
+
+
     #test = word("Alliacom")
-    #garbage = []
-    #miniBf("",garbage   )
+    #
     #smallDic = getSmallDic(test.word, dico)
     #test.genWords(smallDic, "" , 0)
     #print(test.done)
