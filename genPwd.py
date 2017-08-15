@@ -3,6 +3,99 @@ import itertools
 import argparse
 from threading import Thread
 
+#----------------------------------Classes-------------------------------------------------#
+#Class to generate Leet from a word
+class word:
+    #Initialisation
+    def __init__(self, word):
+        self.word = word
+        self.done = []
+
+    #Function to generate all leet possible
+    def genWords(self, dictionary, string, pos):
+        res = ""
+        if len(string)<len(self.word):
+            for j in self.word[pos:]:
+                for i in dictionary:
+                    if j.lower() == i[0]:
+                        for k in i:
+                            res = string + k
+                            self.genWords(dictionary,res,pos+1)
+                break
+
+        else:
+            self.done.append(string)
+
+#Class to generate all dates format
+class date:
+    #Initialisation
+    def __init__(self, date):
+        if len(date.split('/')) == 3:
+            self.day = date.split('/')[0]
+            self.month = date.split('/')[1]
+            self.year = [date.split('/')[2], date.split('/')[2][2:]]
+        else:
+            self.day = date.split('/')[0]
+            self.month = date.split('/')[1]
+            self.year = 0
+        self.done = []
+
+    #Generate all differents formats for a given date : d-m-y (little endian)/ m-d-y (middle endian)/ y-m-d (big endian)
+    def genDatesFormat(self, dictionary):
+        self.month = self.month.split(' ') #Transform string in list of strings
+        for month in dictionary:
+            if self.month[0] in month:
+                self.month = month
+                break
+        if self.year != 0:
+            temp = [self.day.split(' '), self.month, self.year]
+            temp2 = [self.month, self.day.split(' '), self.year]
+            temp3 = [self.year, self.month, self.day.split(' ')]
+            temp = list(itertools.product(*temp))
+            temp2 = list(itertools.product(*temp2))
+            temp3 = list(itertools.product(*temp3))
+            for x in temp2:
+                temp.append(x)
+            for x in temp3:
+                temp.append(x)
+        else:
+            temp = [self.day.split(' '), self.month]
+            temp2 = [self.month, self.day.split(' ')]
+            temp = list(itertools.product(*temp))
+            temp2 = list(itertools.product(*temp2))
+            for x in temp2:
+                temp.append(x)
+        self.done = temp
+
+#------------------------------------------------------------------------------------------#
+
+#----------------------------------Threads-------------------------------------------------#
+#Thread to generate leet for all words in personal infos
+class genObjects(Thread):
+    def __init__(self, word, dictionary):
+        Thread.__init__(self)
+        self.word = word
+        self.dictionary = dictionary
+        super(genObjects, self).__init__()
+
+    def run(self):
+        self.word.genWords(self.dictionary, "", 0)
+
+#Thread to generate dates format for all dates
+class genDates(Thread):
+    def __init__(self, date, dictionary):
+        Thread.__init__(self)
+        self.word = date
+        self.dictionary = dictionary
+        super(genDates, self).__init__()
+
+    def run(self):
+        self.word.genDatesFormat(self.dictionary)
+
+
+#------------------------------------------------------------------------------------------#
+
+#----------------------------------Functions-----------------------------------------------#
 def loadDatesWithSeparators(myDates):
     res = []
     separators = " -_/|"
@@ -82,68 +175,6 @@ def getSmallDic(word, dictionary):
                 res.append(j)
     return res
 
-#Class to generate Leet from a word
-class word:
-    #Initialisation
-    def __init__(self, word):
-        self.word = word
-        self.done = []
-
-    #Function to generate all leet possible
-    def genWords(self, dictionary, string, pos):
-        res = ""
-        if len(string)<len(self.word):
-            for j in self.word[pos:]:
-                for i in dictionary:
-                    if j.lower() == i[0]:
-                        for k in i:
-                            res = string + k
-                            self.genWords(dictionary,res,pos+1)
-                break
-
-        else:
-            self.done.append(string)
-
-#Class to generate all dates format
-class date:
-    #Initialisation
-    def __init__(self, date):
-        if len(date.split('/')) == 3:
-            self.day = date.split('/')[0]
-            self.month = date.split('/')[1]
-            self.year = [date.split('/')[2], date.split('/')[2][2:]]
-        else:
-            self.day = date.split('/')[0]
-            self.month = date.split('/')[1]
-            self.year = 0
-        self.done = []
-
-    #Generate all differents formats for a given date : d-m-y (little endian)/ m-d-y (middle endian)/ y-m-d (big endian)
-    def genDatesFormat(self, dictionary):
-        self.month = self.month.split(' ') #Transform string in list of strings
-        for month in dictionary:
-            if self.month[0] in month:
-                self.month = month
-                break
-        if self.year != 0:
-            temp = [self.day.split(' '), self.month, self.year]
-            temp2 = [self.month, self.day.split(' '), self.year]
-            temp3 = [self.year, self.month, self.day.split(' ')]
-            temp = list(itertools.product(*temp))
-            temp2 = list(itertools.product(*temp2))
-            temp3 = list(itertools.product(*temp3))
-            for x in temp2:
-                temp.append(x)
-            for x in temp3:
-                temp.append(x)
-        else:
-            temp = [self.day.split(' '), self.month]
-            temp2 = [self.month, self.day.split(' ')]
-            temp = list(itertools.product(*temp))
-            temp2 = list(itertools.product(*temp2))
-            for x in temp2:
-                temp.append(x)
-        self.done = temp
 
 #Function to combines all our results from leet words and dates : technically it works ... but use too much rssources
 def packing(myWords, myDates, garbage):
@@ -168,34 +199,8 @@ def packing(myWords, myDates, garbage):
     return res
 
 
-#Thread to generate leet for all words in personal infos
-class genObjects(Thread):
-    def __init__(self, word, dictionary):
-        Thread.__init__(self)
-        self.word = word
-        self.dictionary = dictionary
-        super(genObjects, self).__init__()
 
-    def run(self):
-        self.word.genWords(self.dictionary, "", 0)
-
-#Thread to generate dates format for all dates
-class genDates(Thread):
-    def __init__(self, date, dictionary):
-        Thread.__init__(self)
-        self.word = date
-        self.dictionary = dictionary
-        super(genDates, self).__init__()
-
-    def run(self):
-        self.word.genDatesFormat(self.dictionary)
-
-#???? Is it usefull ????
-def checkInFile(string, file):
-    if string in file:
-        return 0
-    else:
-        return 1
+#------------------------------------------------------------------------------------------#
 
 #MAIN
 if __name__=="__main__":
@@ -213,7 +218,7 @@ if __name__=="__main__":
     myDates = threadDateLauncher(dateList, dicoMonth)
     garbage = ["1","2"]
     print(loadDatesWithSeparators(myDates))
-    packing(myWords, myDates, garbage)
+    #packing(myWords, myDates, garbage)
     #miniBf("",garbage)
 
 
