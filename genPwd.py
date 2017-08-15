@@ -1,9 +1,21 @@
+#----------------------------------Credits-------------------------------------------------#
+
+#                          Made by Squadella & ZkClown                                     #
+
+#------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------Imports-------------------------------------------------#
+
 import csv
 import itertools
 import argparse
 from threading import Thread
 import os
+import datetime
 
+#------------------------------------------------------------------------------------------#
 #----------------------------------Classes-------------------------------------------------#
 #Class to generate Leet from a word
 class word:
@@ -22,6 +34,8 @@ class word:
                         for k in i:
                             res = string + k
                             self.genWords(dictionary,res,pos+1)
+
+
                 break
 
         else:
@@ -103,8 +117,19 @@ class partCombine(Thread):
         super(partCombine, self).__init__()
 
     def run(self):
-        packing2(self.list, self.begValue, self.end, self.index)
+        packing(self.list, self.begValue, self.end, self.index)
 
+class partCombNext(Thread):
+    def __init__(self,list, begValue, end, index):
+        Thread.__init__(self)
+        self.begValue = begValue
+        self.end = end
+        self.index = index
+        self.list = list
+        super(partCombNext, self).__init__()
+
+    def run(self):
+        packNext(self.list, self.begValue, self.end, self.index)
 
 #------------------------------------------------------------------------------------------#
 #----------------------------------Thread Launchers----------------------------------------#
@@ -136,10 +161,8 @@ def threadDateLauncher(dateList,dictionary):
 
     return myDates
 
-def threadCombiner(list, index):
-    file = open("init.txt","w")
-    for word in list:
-        file.write(word+"\n")
+def threadCombiner(list):
+    initList(list)
     lastValue = 0
     threadNumber = 0
     step = 100
@@ -156,16 +179,37 @@ def threadCombiner(list, index):
     print("Fin lancement thread")
     for thread in tmp:
         thread.join()
-    os.system("cat *.txt > output"+str(index)+" && rm *.txt")
+    os.system("cat ./buffer/*.txt > ./buffer/output && rm ./buffer/*.txt")
 
-
+def threadCombNext(list, rec):
+    for i in range(0,rec):
+        lastValue = 0
+        threadNumber = 0
+        step = 200
+        tmp = []
+        for i in range(0,len(list)):
+            if(i%step == 0):
+                tmp.append(partCombNext(list, lastValue, i, threadNumber))
+                lastValue = i
+                threadNumber += 1
+        if(lastValue!=len(list)):
+            tmp.append(partCombNext(list, lastValue, len(list), threadNumber))
+        for thread in tmp:
+            thread.start()
+        print("Fin lancement thread")
+        for thread in tmp:
+            thread.join()
+        os.system("cat ./buffer/*.txt > ./buffer/output"+str(i)+" && rm ./buffer/*.txt")
 
 
 #------------------------------------------------------------------------------------------#
 #----------------------------------Functions-----------------------------------------------#
+
+#----------------------------------Loading Csv---------------------------------------------#
 def loadDatesWithSeparators(myDates):
     res = []
     separators = " -_/|"
+    now = datetime.datetime.now()
     for date in myDates:
         for dateFormated in date.done:
             if len(dateFormated) == 2:
@@ -176,6 +220,7 @@ def loadDatesWithSeparators(myDates):
                 for sep in separators:
                     res.append(dateFormated[0]+sep+dateFormated[1]+sep+dateFormated[2])
                 res.append(dateFormated[0]+dateFormated[1]+dateFormated[2])
+    res.append(str(now.year))
     return res
 
 def loadPersonalsDatas(dictionary, dateList, wordList): #dateList must be empty
@@ -185,33 +230,35 @@ def loadPersonalsDatas(dictionary, dateList, wordList): #dateList must be empty
         else:
             wordList.append(entry[0])
 
-def threadLauncher(wordList,dictionary):
-    myWords = []
-    temp = []
-    for wordInList in wordList:
-        myWords.append(word(wordInList))
-    for i in myWords:
-        temp.append(genObjects(i, dictionary))
-    for thread in temp:
-        thread.start()
-    for thread in temp:
-        thread.join()
+#Load CSV (LeetTab / Date Conversion / Personals infos)
+def loadCsv(file, myDelimiter):
+    res = []
+    with open(file, newline='') as csvfile:
+        reader = csv.reader(csvfile, delimiter=myDelimiter)
+        for i in reader:
+            res.append(i)
+    return res
 
-    return myWords
 
-def threadDateLauncher(dateList,dictionary):
-    myDates = []
-    temp = []
-    for dateInList in dateList:
-        myDates.append(date(dateInList))
-    for i in myDates:
-        temp.append(genDates(i, dictionary))
-    for thread in temp:
-        thread.start()
-    for thread in temp:
-        thread.join()
 
-    return myDates
+#----------------------------------Utils---------------------------------------------------#
+#Take the leet table and juste get the lines usefull
+def getSmallDic(word, dictionary):
+    res = []
+    word = list(set(word.lower()))
+    for i in word:
+        for j in dictionary:
+            if i == j[0]:
+                res.append(j)
+    return res
+
+#list of lists to simple list
+def lolToSl(myWords):
+    words = []
+    for word in myWords:
+        for done in word.done:
+            words.append(done)
+    return words
 
 #Generate all possible strings from 1 char to 4 char (BF)
 def miniBf(string, list):
@@ -223,96 +270,70 @@ def miniBf(string, list):
             list.append(res)
             miniBf(res, list)
 
-#Load CSV (LeetTab / Date Conversion / Personals infos)
-def loadCsv(file, myDelimiter):
-    res = []
-    with open(file, newline='') as csvfile:
-        reader = csv.reader(csvfile, delimiter=myDelimiter)
-        for i in reader:
-            res.append(i)
-    return res
+#------------------------------------------------------------------------------------------#
 
-#Take the leet table and juste get the lines usefull
-def getSmallDic(word, dictionary):
-    res = []
-    word = list(set(word.lower()))
-    for i in word:
-        for j in dictionary:
-            if i == j[0]:
-                res.append(j)
-    return res
+#----------------------------------Writing-------------------------------------------------#
+def initList(list):
+    file = open("./buffer/init","w")
+    for word in list:
+        file.write(word+"\n")
+    file.close()
 
-
-#Function to combines all our results from leet words and dates : technically it works ... but use too much rssources
-def packing(myWords, myDates, garbage):
-    res = []
-    dates = loadDatesWithSeparators(myDates)
-    words = []
-    for word in myWords:
-        for done in word.done:
-            words.append(done)
-    #print(len(words))
-    temp = ["words","dates","garbage"]
-    iter2 = list(itertools.product(temp, repeat=2))
-    iter3 = list(itertools.product(temp, repeat=3))
-    iter4 = list(itertools.product(temp, repeat=4))
-    for i in iter2:
-        res.append(list(itertools.product(eval(i[0]),eval(i[1]))))
-    #    break
-    for i in iter3:
-        res.append(list(itertools.product(eval(i[0]),eval(i[1]),eval(i[2]))))
-    for i in iter3:
-        res.append(list(itertools.product(eval(i[0]),eval(i[1]),eval(i[2]),eval(i[3]))))
-    return res
-
-#list of lists to simple list
-def lolToSl(myWords):
-    words = []
-    for word in myWords:
-        for done in word.done:
-            words.append(done)
-    return words
-
-def packing2(list, start, end, index):
-    file = open(str(index)+".txt","w")
+def packing(list, start, end, index):
+    file = open("./buffer/"+str(index)+".txt","w")
     for i in range(start,end):
         for j in range(0,len(list)):
             file.write(list[i]+list[j]+"\n")
 
     file.close()
 
+def packNext(list, start,end,index):
+    file = open("./buffer/"+str(index)+".txt","w")
+    file2 = open("./buffer/output", "r")
+    for i in range(start,end):
+        for line in file2:
+            file.write(list[i]+line)
+    file2.close()
+    file.close()
+
+
+
 #------------------------------------------------------------------------------------------#
 
-#MAIN
+#----------------------------------Main----------------------------------------------------#
 if __name__=="__main__":
+
+    wordList = []
+    dateList = []
+    garbage = []
+
     ap = argparse.ArgumentParser()
     ap.add_argument("-f", "--file", required=True, help="file wich contains personals datas")
+    ap.add_argument("-r", "--recurence", help="Number of iterations")
+    ap.add_argument("-b", "--brute", help="Activate brute force")
+    arg = ap.parse_args()
     args = vars(ap.parse_args())
-
 
     dico = loadCsv("leetTab.csv",";")
     dicoMonth = loadCsv("date.csv",";")
-    dateList = []
-    wordList = []
     loadPersonalsDatas(loadCsv(args["file"], ";"), dateList, wordList)
+
     myWords = threadLauncher(wordList, dico)
     myDates = threadDateLauncher(dateList, dicoMonth)
-    garbage = ["1","2"]
 
-    threadCombiner(lolToSl(myWords),0)
-    #packing(myWords, myDates, garbage)
-    #miniBf("",garbage)
+    if arg.brute:
+        if args["brute"] == "1":
+            miniBf("", garbage)
 
-
-    #test = word("Alliacom")
-    #
-    #smallDic = getSmallDic(test.word, dico)
-    #test.genWords(smallDic, "" , 0)
-    #print(test.done)
-    #testD = date("22/01")
-    #testD.genDatesFormat(dicoMonth)
-    #print(testD.done)
-
+    if arg.recurence:
+        if args["recurence"] in "0123456789":
+            if int(args["recurence"]) > 0:
+                threadCombiner(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage)
+                if int(args["recurence"]) > 1:
+                    threadCombNext(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage,int(args['recurence']))
+    else:
+        initList(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage)
+    os.system("cat ./buffer/* > ./output.list && rm -f ./buffer/*")
 
 
-    print("hi !")
+#------------------------------------------------------------------------------------------#
