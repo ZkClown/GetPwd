@@ -5,6 +5,7 @@ It's a tool which generate a dictionary from a csv containing personals informat
 
 Generate all common passwords based on perso info. (leet transformations and combinatory processing)
 
+The script is written in PYTHON 3
 ## Exemple
 
 ### Personnals infos :
