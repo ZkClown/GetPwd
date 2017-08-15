@@ -2,6 +2,7 @@ import csv
 import itertools
 import argparse
 from threading import Thread
+import os
 
 #----------------------------------Classes-------------------------------------------------#
 #Class to generate Leet from a word
@@ -92,9 +93,75 @@ class genDates(Thread):
     def run(self):
         self.word.genDatesFormat(self.dictionary)
 
+class partCombine(Thread):
+    def __init__(self,list, begValue, end, index):
+        Thread.__init__(self)
+        self.begValue = begValue
+        self.end = end
+        self.index = index
+        self.list = list
+        super(partCombine, self).__init__()
+
+    def run(self):
+        packing2(self.list, self.begValue, self.end, self.index)
+
 
 #------------------------------------------------------------------------------------------#
+#----------------------------------Thread Launchers----------------------------------------#
+def threadLauncher(wordList,dictionary):
+    myWords = []
+    temp = []
+    for wordInList in wordList:
+        myWords.append(word(wordInList))
+    for i in myWords:
+        temp.append(genObjects(i, dictionary))
+    for thread in temp:
+        thread.start()
+    for thread in temp:
+        thread.join()
 
+    return myWords
+
+def threadDateLauncher(dateList,dictionary):
+    myDates = []
+    temp = []
+    for dateInList in dateList:
+        myDates.append(date(dateInList))
+    for i in myDates:
+        temp.append(genDates(i, dictionary))
+    for thread in temp:
+        thread.start()
+    for thread in temp:
+        thread.join()
+
+    return myDates
+
+def threadCombiner(list, index):
+    file = open("init.txt","w")
+    for word in list:
+        file.write(word+"\n")
+    lastValue = 0
+    threadNumber = 0
+    step = 100
+    tmp = []
+    for i in range(0,len(list)):
+        if(i%step == 0):
+            tmp.append(partCombine(list, lastValue, i, threadNumber))
+            lastValue = i
+            threadNumber += 1
+    if(lastValue!=len(list)):
+        tmp.append(partCombine(list, lastValue, len(list), threadNumber))
+    for thread in tmp:
+        thread.start()
+    print("Fin lancement thread")
+    for thread in tmp:
+        thread.join()
+    os.system("cat *.txt > output"+str(index)+" && rm *.txt")
+
+
+
+
+#------------------------------------------------------------------------------------------#
 #----------------------------------Functions-----------------------------------------------#
 def loadDatesWithSeparators(myDates):
     res = []
@@ -198,7 +265,21 @@ def packing(myWords, myDates, garbage):
         res.append(list(itertools.product(eval(i[0]),eval(i[1]),eval(i[2]),eval(i[3]))))
     return res
 
+#list of lists to simple list
+def lolToSl(myWords):
+    words = []
+    for word in myWords:
+        for done in word.done:
+            words.append(done)
+    return words
 
+def packing2(list, start, end, index):
+    file = open(str(index)+".txt","w")
+    for i in range(start,end):
+        for j in range(0,len(list)):
+            file.write(list[i]+list[j]+"\n")
+
+    file.close()
 
 #------------------------------------------------------------------------------------------#
 
@@ -217,7 +298,8 @@ if __name__=="__main__":
     myWords = threadLauncher(wordList, dico)
     myDates = threadDateLauncher(dateList, dicoMonth)
     garbage = ["1","2"]
-    print(loadDatesWithSeparators(myDates))
+
+    threadCombiner(lolToSl(myWords),0)
     #packing(myWords, myDates, garbage)
     #miniBf("",garbage)
 
