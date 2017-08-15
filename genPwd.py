@@ -310,7 +310,7 @@ if __name__=="__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("-f", "--file", required=True, help="file wich contains personals datas")
     ap.add_argument("-r", "--recurence", help="Number of iterations")
-    ap.add_argument("-b", "--brute", help="Activate brute force")
+    ap.add_argument("-b", "--brute", help="Activate brute force, 1 to active")
     arg = ap.parse_args()
     args = vars(ap.parse_args())
 
