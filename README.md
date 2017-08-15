@@ -37,6 +37,7 @@ optional arguments:
 
 ## CSV format
 The csv has to contain 1 info per line !
+dates must have the following format : dd/mm/yyyy (01/12/2012)
 
 ## CAUTION
 
