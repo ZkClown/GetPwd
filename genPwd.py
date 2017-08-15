@@ -47,10 +47,25 @@ class date:
     def __init__(self, date):
         if len(date.split('/')) == 3:
             self.day = date.split('/')[0]
+
+            if(len(self.day) == 1):
+                self.day = self.day.split(' ')
+                self.day.append("0"+self.day[0])
+            else:
+                if int(self.day) < 9:
+                    self.day = self.day.split(' ')
+                    self.day.append(self.day[0][-1:])
             self.month = date.split('/')[1]
             self.year = [date.split('/')[2], date.split('/')[2][2:]]
         else:
             self.day = date.split('/')[0]
+            if(len(self.day) == 1):
+                self.day = self.day.split(' ')
+                self.day.append("0"+self.day[0])
+            else:
+                if int(self.day) < 9:
+                    self.day = self.day.split(' ')
+                    self.day.append(self.day[0][-1:])
             self.month = date.split('/')[1]
             self.year = 0
         self.done = []
@@ -63,9 +78,9 @@ class date:
                 self.month = month
                 break
         if self.year != 0:
-            temp = [self.day.split(' '), self.month, self.year]
-            temp2 = [self.month, self.day.split(' '), self.year]
-            temp3 = [self.year, self.month, self.day.split(' ')]
+            temp = [self.day, self.month, self.year]
+            temp2 = [self.month, self.day, self.year]
+            temp3 = [self.year, self.month, self.day]
             temp = list(itertools.product(*temp))
             temp2 = list(itertools.product(*temp2))
             temp3 = list(itertools.product(*temp3))
@@ -74,8 +89,8 @@ class date:
             for x in temp3:
                 temp.append(x)
         else:
-            temp = [self.day.split(' '), self.month]
-            temp2 = [self.month, self.day.split(' ')]
+            temp = [self.day, self.month]
+            temp2 = [self.month, self.day]
             temp = list(itertools.product(*temp))
             temp2 = list(itertools.product(*temp2))
             for x in temp2:
