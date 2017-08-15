@@ -1,9 +1,9 @@
 # GetPwd
 
 ## Description
-It's a tool which generate a dictionary from a csv containing personals informations.
+It's a tool which generates a dictionary from a csv containing personal informations.
 
-Generate all common passwords based on perso info. (leet transformations and combinatory processing)
+Generates all common passwords based on perso info. (leet transformations and combinatory processing)
 
 The script is written in PYTHON 3
 ## Exemple
@@ -43,7 +43,7 @@ optional arguments:
 
 ## CSV format
 The csv has to contain 1 info per line !
-dates must have the following format : dd/mm/yyyy (01/12/2012)
+Dates must have the following format : dd/mm/yyyy (01/12/2012)
 
 ## CAUTION
 
