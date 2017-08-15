@@ -36,7 +36,10 @@ optional arguments:
                         Number of iterations
   -b BRUTE, --brute BRUTE
                         Activate brute force, 1 to activate
+  -d DIFFERENCE, --difference
+                        Activate the re usage of a same info more than once, 1 to activate
 ```
+
 
 ## CSV format
 The csv has to contain 1 info per line !
