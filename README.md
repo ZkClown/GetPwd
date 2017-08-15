@@ -46,3 +46,5 @@ The more infos there are in the csv, the larger the dictionary will be ! Same fo
 
 ## Credits
 Made by [ZkClown](https://github.com/ZkClown) & [Squadella](https://github.com/Squadella)
+
+[![Python 3|3.6](https://img.shields.io/badge/python-3%7C3.5-yellow.svg)](https://www.python.org/)
