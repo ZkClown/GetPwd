@@ -3,7 +3,7 @@
 ## Description
 It's a tool which generate a dictionary from a csv containing personals informations.
 
-Generate all common password based on perso info. (leet transformations and combinatory processing)
+Generate all common passwords based on perso info. (leet transformations and combinatory processing)
 
 ## Exemple
 
