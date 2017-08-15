@@ -38,5 +38,9 @@ optional arguments:
 ## CSV format
 The csv has to contain 1 info per line !
 
+## CAUTION
+
+The more infos there are in the csv, the larger the dictionary will be ! Same for iterations !
+
 ## Credits
 Made by [ZkClown](https://github.com/ZkClown) & [Squadella](https://github.com/Squadella)
