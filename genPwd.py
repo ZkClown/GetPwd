@@ -316,30 +316,54 @@ def initList(list):
 
 def packing(list, start, end, index, diff , myWords, myDates):
     flag = 0
+    flag2 = 0
+    j = 0
+    temp = ""
     file = open("./buffer/"+str(index)+".txt","w")
-    for i in range(start,end):
-        for j in range(0,len(list)):
-            if diff != 1:
+    if diff != 1:
+        for i in range(start,end):
+            for j in range(0,len(list)):
                 file.write(list[i]+list[j]+"\n")
-            else:
+    else:
+        for i in range(start,end):
+            while j < len(list):
                 if len(list[i].split('/')) != 1 and len(list[j].split('/')) != 1:
-                    for date in myDates:
-                        if list[i] in date.done and list[j] in date.done:
-                            flag = 1
-                            break
-                    if flag == 0:
+                    if flag2 == 0:
+                        for date in myDates:
+                            if list[i] in date.done and list[j] in date.done:
+                                j += len(date.done)
+                                break
+                            elif list[j] in date.done:
+                                temp = date.done[-1]
+                                flag2 = 1
+                                j += 1
+                                break
+                            file.write(list[i]+list[j]+"\n")
+                    else:
+                        if list[j] == temp:
+                            flag2 = 0
                         file.write(list[i]+list[j]+"\n")
-                    flag = 0
+                        j += 1
                 elif len(list[i].split('/')) == 1 and len(list[j].split('/')) == 1:
-                    for word in myWords:
-                        if list[i] in word.done and list[j] in word.done:
-                            flag = 1
-                            break
-                    if flag == 0:
+                    if flag2 == 0:
+                        for word in myWords:
+                            if list[i] in word.done and list[j] in word.done:
+                                j += len(word.done)
+                                break
+                            elif list[j] in word.done:
+                                temp = word.done[-1]
+                                flag2 = 1
+                                break
                         file.write(list[i]+list[j]+"\n")
-                    flag = 0
-                else:
-                    file.write(list[i]+list[j]+"\n")
+                        j += 1
+                    else:
+                        if list[j] == temp:
+                            flag2 = 0
+                        file.write(list[i]+list[j]+"\n")
+                        j += 1
+            temp = ""
+            flag2 = 0
+            j = 0
     file.close()
 
 def packNext(list, startValue,endValue,index, diff, myWords, myDates):
