@@ -206,7 +206,7 @@ def threadDateLauncher(dateList,dictionary):
 def threadCombiner(list, diff, myWords, myDates):
     initList(list)
     lastValue = 0
-    threadNumber = 0
+    threadNumber = 1
     step = int(len(list)/3)
     tmp = []
     for i in range(1,len(list)):
@@ -320,7 +320,7 @@ def miniBf(string, list):
 
 #----------------------------------Writing-------------------------------------------------#
 def initList(list):
-    file = open("./buffer/init","w")
+    file = open("./buffer/000","w")
     for word in list:
         file.write(word+"\n")
     file.close()
@@ -335,7 +335,7 @@ def packing(list, start, end, index, diff , myWords, myDates):
     flag2 = 0
     j = 0
     temp = ""
-    file = open("./buffer/"+str(index)+".txt","w")
+    file = open("./buffer/"+str(index).zfill(3)+".txt","w")
     if diff != 1:
         for i in range(start,end):
             for j in range(0,len(list)):
@@ -367,7 +367,7 @@ def packing(list, start, end, index, diff , myWords, myDates):
 
 def packNext(list, startValue,endValue,index, diff, myWords, myDates):
     flag = 0
-    file = open("./buffer/"+str(index)+".txt","w")
+    file = open("./buffer/"+str(index).zfill(3)+".txt","w")
     for i in range(startValue, endValue):
         file2 = open("./buffer/output", "r")
         for line in file2:
@@ -436,18 +436,12 @@ if __name__=="__main__":
         if args["recurence"] in "0123456789":
             if int(args["recurence"]) > 0:
                 if args["difference"] == "1":
-                    if len(wordList+dateList+garbage) == 1:
-                        initList(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage)
-                    else:
-                        threadCombiner(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage, 1, myWords, myDates)
+                    threadCombiner(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage, 1, myWords, myDates)
                 else:
                     threadCombiner(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage, 0, [], [])
                 if int(args["recurence"]) > 1:
                     if args["difference"] == "1":
-                        if len(wordList+dateList+garbage) == 1:
-                            initList(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage)
-                        else:
-                            threadCombNext(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage,int(args['recurence']), 1, myWords, myDates)
+                        threadCombNext(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage,int(args['recurence']), 1, myWords, myDates)
                     else:
                         threadCombNext(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage,int(args['recurence']), 0, [], [])
 
