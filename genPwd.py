@@ -65,16 +65,24 @@ class date:
             self.month = date.split('/')[1]
             self.year = [date.split('/')[2], date.split('/')[2][2:]]
         elif len(date.split('/')) == 2:
-            self.day = date.split('/')[0]
-            if(len(self.day) == 1):
-                self.day = self.day.split(' ')
-                self.day.append("0"+self.day[0])
-            else:
-                if int(self.day) < 9:
+            if len(date.split('/')[1]) != 4:
+                self.day = date.split('/')[0]
+                if(len(self.day) == 1):
                     self.day = self.day.split(' ')
-                    self.day.append(self.day[0][-1:])
-            self.month = date.split('/')[1]
-            self.year = 0
+                    self.day.append("0"+self.day[0])
+                else:
+                    if int(self.day) < 9:
+                        self.day = self.day.split(' ')
+                        self.day.append(self.day[0][-1:])
+                    else:
+                        self.day = self.day.split(' ')
+                self.month = date.split('/')[1]
+                self.year = 0
+            else:
+                self.day = 0
+                self.month = date.split('/')[0]
+                self.year = [date.split('/')[1], date.split('/')[1][2:]]
+
         else:
             self.month = 0
             self.day = 0
@@ -95,27 +103,54 @@ class date:
                 temp = [self.day, self.month, self.year]
                 temp2 = [self.month, self.day, self.year]
                 temp3 = [self.year, self.month, self.day]
+
+                temp4 = [self.day, self.month]
+                temp5 = [self.month, self.day]
+
+                temp6 = [self.month, self.year]
+                temp7 = [self.year, self.month]
+
                 temp = list(itertools.product(*temp))
                 temp2 = list(itertools.product(*temp2))
                 temp3 = list(itertools.product(*temp3))
+
+                temp4 = list(itertools.product(*temp4))
+                temp5 = list(itertools.product(*temp5))
+
+                temp6 = list(itertools.product(*temp6))
+                temp7 = list(itertools.product(*temp7))
                 for x in temp2:
                     temp.append(x)
                 for x in temp3:
                     temp.append(x)
-                temp4 = [self.day, self.month]
-                temp5 = [self.month, self.day]
-                temp4 = list(itertools.product(*temp4))
-                temp5 = list(itertools.product(*temp5))
+
                 for x in temp4:
                     temp.append(x)
                 for x in temp5:
                     temp.append(x)
+
+                for x in temp6:
+                    temp.append(x)
+                for x in temp7:
+                    temp.append(x)
+
                 temp.append([self.year[0]])
                 temp.append([self.year[1]])
-            else:
+
+            elif self.month == 0 and self.day == 0:
                 temp = []
                 temp.append([self.year[0]])
                 temp.append([self.year[1]])
+
+            else:
+                temp = [self.month, self.year]
+                temp2 = [self.year, self.month]
+
+                temp = list(itertools.product(*temp))
+                temp2 = list(itertools.product(*temp2))
+
+                for x in temp2:
+                    temp.append(x)
 
         else:
             temp = [self.day, self.month]
