@@ -24,6 +24,7 @@ class word:
     def __init__(self, word):
         self.word = word
         self.done = []
+        self.done2 = []
 
     #Function to generate all leet possible
     def genWords(self, dictionary, string, pos):
@@ -35,8 +36,6 @@ class word:
                         for k in i:
                             res = string + k
                             self.genWords(dictionary,res,pos+1)
-
-
                 break
 
         else:
@@ -72,6 +71,7 @@ class date:
             self.month = date.split('/')[1]
             self.year = 0
         self.done = []
+        self.done2 = []
 
     #Generate all differents formats for a given date : d-m-y (little endian)/ m-d-y (middle endian)/ y-m-d (big endian)
     def genDatesFormat(self, dictionary):
@@ -107,6 +107,16 @@ class date:
             for x in temp2:
                 temp.append(x)
         self.done = temp
+
+    def convertDoneInList(self):
+        now = datetime.datetime.now()
+        res = [self]
+        self.done2 = loadDatesWithSeparators(res)
+        self.done2.remove(str(now.year))
+        #print(self.done)
+
+    def reasignDone(self,list):
+        self.done = list
 
 #------------------------------------------------------------------------------------------#
 
@@ -305,6 +315,7 @@ def miniBf(string, list):
             list.append(res)
             miniBf(res, list)
 
+
 #------------------------------------------------------------------------------------------#
 
 #----------------------------------Writing-------------------------------------------------#
@@ -315,6 +326,11 @@ def initList(list):
     file.close()
 
 def packing(list, start, end, index, diff , myWords, myDates):
+    for date in myDates:
+        date.convertDoneInList()
+        #print(date.done2)
+    for word in myWords:
+        word.done2 = word.done
     flag = 0
     flag2 = 0
     j = 0
@@ -327,40 +343,23 @@ def packing(list, start, end, index, diff , myWords, myDates):
     else:
         for i in range(start,end):
             while j < len(list):
-                if len(list[i].split('/')) != 1 and len(list[j].split('/')) != 1:
-                    if flag2 == 0:
-                        for date in myDates:
-                            if list[i] in date.done and list[j] in date.done:
-                                j += len(date.done)
-                                break
-                            elif list[j] in date.done:
-                                temp = date.done[-1]
-                                flag2 = 1
-                                j += 1
-                                break
-                            file.write(list[i]+list[j]+"\n")
-                    else:
-                        if list[j] == temp:
-                            flag2 = 0
-                        file.write(list[i]+list[j]+"\n")
-                        j += 1
-                elif len(list[i].split('/')) == 1 and len(list[j].split('/')) == 1:
-                    if flag2 == 0:
-                        for word in myWords:
-                            if list[i] in word.done and list[j] in word.done:
-                                j += len(word.done)
-                                break
-                            elif list[j] in word.done:
-                                temp = word.done[-1]
-                                flag2 = 1
-                                break
-                        file.write(list[i]+list[j]+"\n")
-                        j += 1
-                    else:
-                        if list[j] == temp:
-                            flag2 = 0
-                        file.write(list[i]+list[j]+"\n")
-                        j += 1
+                if flag2 == 0:
+                    for word in myWords+myDates:
+                        if list[i] in word.done2 and list[j] in word.done2:
+                            j += len(word.done2)-1
+                            break
+                        elif list[j] in word.done2:
+                            temp = word.done2[-1]
+                            flag2 = 1
+                            break
+                    #print(i, j, len(list))
+                    file.write(list[i]+list[j]+"\n")
+                    j += 1
+                else:
+                    if list[j] == temp:
+                        flag2 = 0
+                    file.write(list[i]+list[j]+"\n")
+                    j += 1
             temp = ""
             flag2 = 0
             j = 0
