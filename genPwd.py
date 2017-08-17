@@ -64,7 +64,7 @@ class date:
                     self.day = self.day.split(' ')
             self.month = date.split('/')[1]
             self.year = [date.split('/')[2], date.split('/')[2][2:]]
-        else:
+        elif len(date.split('/')) == 2:
             self.day = date.split('/')[0]
             if(len(self.day) == 1):
                 self.day = self.day.split(' ')
@@ -75,37 +75,47 @@ class date:
                     self.day.append(self.day[0][-1:])
             self.month = date.split('/')[1]
             self.year = 0
+        else:
+            self.month = 0
+            self.day = 0
+            self.year = [date, date[2:]]
         self.done = []
         self.done2 = []
 
     #Generate all differents formats for a given date : d-m-y (little endian)/ m-d-y (middle endian)/ y-m-d (big endian)
     def genDatesFormat(self, dictionary):
-        self.month = self.month.split(' ') #Transform string in list of strings
-        for month in dictionary:
-            if self.month[0] in month:
-                self.month = month
-                break
+        if self.month != 0:
+            self.month = self.month.split(' ') #Transform string in list of strings
+            for month in dictionary:
+                if self.month[0] in month:
+                    self.month = month
+                    break
         if self.year != 0:
-            temp = [self.day, self.month, self.year]
-            temp2 = [self.month, self.day, self.year]
-            temp3 = [self.year, self.month, self.day]
-            temp = list(itertools.product(*temp))
-            temp2 = list(itertools.product(*temp2))
-            temp3 = list(itertools.product(*temp3))
-            for x in temp2:
-                temp.append(x)
-            for x in temp3:
-                temp.append(x)
-            temp4 = [self.day, self.month]
-            temp5 = [self.month, self.day]
-            temp4 = list(itertools.product(*temp4))
-            temp5 = list(itertools.product(*temp5))
-            for x in temp4:
-                temp.append(x)
-            for x in temp5:
-                temp.append(x)
-            temp.append([self.year[0]])
-            temp.append([self.year[1]])
+            if self.month != 0 and self.day != 0:
+                temp = [self.day, self.month, self.year]
+                temp2 = [self.month, self.day, self.year]
+                temp3 = [self.year, self.month, self.day]
+                temp = list(itertools.product(*temp))
+                temp2 = list(itertools.product(*temp2))
+                temp3 = list(itertools.product(*temp3))
+                for x in temp2:
+                    temp.append(x)
+                for x in temp3:
+                    temp.append(x)
+                temp4 = [self.day, self.month]
+                temp5 = [self.month, self.day]
+                temp4 = list(itertools.product(*temp4))
+                temp5 = list(itertools.product(*temp5))
+                for x in temp4:
+                    temp.append(x)
+                for x in temp5:
+                    temp.append(x)
+                temp.append([self.year[0]])
+                temp.append([self.year[1]])
+            else:
+                temp = []
+                temp.append([self.year[0]])
+                temp.append([self.year[1]])
 
         else:
             temp = [self.day, self.month]
@@ -283,7 +293,10 @@ def loadPersonalsDatas(dictionary, dateList, wordList): #dateList must be empty
         if entry[0].count('/') > 0:
             dateList.append(entry[0])
         else:
-            wordList.append(entry[0])
+            if(RepresentsInt(entry[0])):
+                dateList.append(entry[0])
+            else:
+                wordList.append(entry[0])
 
 #Load CSV (LeetTab / Date Conversion / Personals infos)
 def loadCsv(file, myDelimiter):
@@ -324,6 +337,13 @@ def miniBf(string, list):
             res = string + char
             list.append(res)
             miniBf(res, list)
+
+def RepresentsInt(s):
+    try:
+        int(s)
+        return True
+    except ValueError:
+        return False
 
 
 #------------------------------------------------------------------------------------------#
