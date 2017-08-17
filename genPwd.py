@@ -99,6 +99,9 @@ class date:
                 temp.append(x)
             for x in temp5:
                 temp.append(x)
+            temp.append([self.year[0]])
+            temp.append([self.year[1]])
+
         else:
             temp = [self.day, self.month]
             temp2 = [self.month, self.day]
@@ -261,10 +264,12 @@ def loadDatesWithSeparators(myDates):
                 for sep in separators:
                     res.append(dateFormated[0]+sep+dateFormated[1])
                 res.append(dateFormated[0]+dateFormated[1])
-            else:
+            elif len(dateFormated) == 3:
                 for sep in separators:
                     res.append(dateFormated[0]+sep+dateFormated[1]+sep+dateFormated[2])
                 res.append(dateFormated[0]+dateFormated[1]+dateFormated[2])
+            else:
+                res.append(dateFormated[0])
     res.append(str(now.year))
     return res
 
@@ -328,7 +333,7 @@ def initList(list):
 def packing(list, start, end, index, diff , myWords, myDates):
     for date in myDates:
         date.convertDoneInList()
-        #print(date.done2)
+        print(date.done2)
     for word in myWords:
         word.done2 = word.done
     flag = 0
@@ -346,7 +351,7 @@ def packing(list, start, end, index, diff , myWords, myDates):
                 if flag2 == 0:
                     for word in myWords+myDates:
                         if list[i] in word.done2 and list[j] in word.done2:
-                            j += len(word.done2)-1
+                            j += len(word.done2)
                             break
                         elif list[j] in word.done2:
                             temp = word.done2[-1]
