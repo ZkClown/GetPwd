@@ -22,7 +22,12 @@ import datetime
 class word:
     #Initialisation
     def __init__(self, word):
-        self.word = word
+        alpha = "abcdefghijklmnopqrstuvwxyz"
+        temp = ""
+        for i in word:
+            if i.lower() in alpha:
+                temp += i
+        self.word = temp
         self.done = []
         self.done2 = []
 
