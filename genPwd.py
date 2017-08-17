@@ -333,7 +333,6 @@ def initList(list):
 def packing(list, start, end, index, diff , myWords, myDates):
     for date in myDates:
         date.convertDoneInList()
-        print(date.done2)
     for word in myWords:
         word.done2 = word.done
     flag = 0
