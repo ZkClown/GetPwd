@@ -17,6 +17,7 @@
 
 import os
 from threading import Thread
+import re
 
 #------------------------------------------------------------------------------------------#
 
@@ -73,7 +74,7 @@ def threadCombiner(list, diff, myWords, myDates):
             tmp.append(partCombine(list, lastValue, i, threadNumber, diff, myWords, myDates))
             lastValue = i
             threadNumber += 1
-    if(lastValue!=len(list)):
+    if(lastValue != len(list)-1):
         tmp.append(partCombine(list, lastValue, len(list), threadNumber, diff, myWords, myDates))
     for thread in tmp:
         thread.start()
@@ -84,7 +85,6 @@ def threadCombiner(list, diff, myWords, myDates):
     os.system("cat ./buffer/*.txt > ./buffer/output && rm ./buffer/*.txt")
 
 def threadCombNext(list, rec, diff, myWords, myDates):
-
     for j in range(1,rec):
         lastValue = 0
         threadNumber = 0
@@ -95,7 +95,7 @@ def threadCombNext(list, rec, diff, myWords, myDates):
                 tmp.append(partCombNext(list, lastValue, i, threadNumber, diff, myWords, myDates))
                 lastValue = i
                 threadNumber += 1
-        if(lastValue!=len(list)):
+        if(lastValue != len(list)-1):
             tmp.append(partCombNext(list, lastValue, len(list), threadNumber, diff, myWords, myDates))
         for thread in tmp:
             thread.start()
@@ -123,7 +123,6 @@ def packing(list, start, end, index, diff , myWords, myDates):
         date.convertDoneInList()
     for word in myWords:
         word.done2 = word.done
-    flag = 0
     flag2 = 0
     j = 0
     temp = ""
@@ -144,7 +143,8 @@ def packing(list, start, end, index, diff , myWords, myDates):
                             temp = word.done2[-1]
                             flag2 = 1
                             break
-                    #print(i, j, len(list))
+                    if j > len(list)-1:
+                        break
                     file.write(list[i]+list[j]+"\n")
                     j += 1
                 else:
@@ -158,40 +158,80 @@ def packing(list, start, end, index, diff , myWords, myDates):
     file.close()
 
 def packNext(list, startValue,endValue,index, diff, myWords, myDates):
+    for date in myDates:
+        date.convertDoneInList()
+    for word in myWords:
+        word.done2 = word.done
     flag = 0
+    flag2 = 0
+    numLine = 0
+    pos = 0
+    count = 0
+    buff = []
+    jump = 1
     file = open("./buffer/"+str(index).zfill(3)+".txt","w")
-    for i in range(startValue, endValue):
-        file2 = open("./buffer/output", "r")
-        for line in file2:
-            if diff != 1:
+    if diff != 1:
+        for i in range(startValue, endValue):
+            file2 = open("./buffer/output", "r")
+            for line in file2:
                 file.write(list[i]+line)
-            else:
-                if len(list[i].split('/')) != 1:
-                    for date in myDates:
-                        if list[i] in date.done:
-                            for x in date.done:
-                                if x in line:
-                                    flag = 1
-                                    break
-                            if flag == 1:
-                                break
+    else:
+        for i in range(startValue, endValue):
+            file2 = open("./buffer/output", "r")
+            for line in file2:
+                if flag2 == 0:
                     if flag == 0:
-                        file.write(list[i]+line)
-                    flag = 0
-                elif len(list[i].split('/')) == 1:
-                    for word in myWords:
-                        if list[i] in word.done:
-                            for x in word.done:
-                                if x in line:
-                                    flag = 1
-                                    break
-                            if flag == 1:
+                        buff = analyzeString(line[:-1], myWords, myDates)
+                        for word in buff:
+                            if list[i] in word[0].done2:
+                                flag = 1
+                                pos = word[1]
+                                if pos == 0:
+                                    numLine = count + len(word[0].done2)*(len(list)-len(word[0].done2)) - 1
+                                else:
+                                    numLine = count + len(word[0].done2) - 1
                                 break
-                    if flag == 0:
-                        file.write(list[i]+line)
-                    flag = 0
-        file2.close()
+                        if flag == 0:
+                            file.write(list[i]+line)
+                            numLine = count + len(buff[-1][0].done2) - 1
+                            flag2 = 1
+                    else:
+                        if count == numLine:
+                            flag = 0
+                else:
+                    file.write(list[i]+line)
+                    if count == numLine:
+                        flag2 = 0
 
+
+                count += 1
+            count = 0
+            file2.close()
     file.close()
+
+
+def analyzeString(string, myWords, myDates):
+    for date in myDates:
+        date.convertDoneInList()
+    for word in myWords:
+        word.done2 = word.done
+    res = []
+    temp = []
+    pos = 0
+    for word in myWords+myDates:
+        for x in word.done2:
+            if x in string:
+                temp.append([x,word])
+                break
+    while temp != []:
+        for x in temp:
+            if string[len(x[0]):] == re.sub(x[0], '', string):
+                res.append([x[1],pos])
+                pos+=1
+                temp.remove(x)
+                string = string[len(x[0]):]
+                break
+    return res
+
 
 #------------------------------------------------------------------------------------------#

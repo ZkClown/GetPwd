@@ -54,6 +54,9 @@ if __name__=="__main__":
     myWords = threadLauncher(wordList, dico)
     myDates = threadDateLauncher(dateList, dicoMonth)
 
+
+
+
     #brute force on 4 char
     if arg.brute:
         if args["brute"] == "1":
@@ -61,7 +64,7 @@ if __name__=="__main__":
 
     #iterations
     if arg.recurence:
-        if args["recurence"] in "0123456789":
+        if args["recurence"] in "012":
             if int(args["recurence"]) > 0:
                 if args["difference"] == "1":
                     threadCombiner(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage, 1, myWords, myDates)
@@ -72,11 +75,13 @@ if __name__=="__main__":
                         threadCombNext(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage,int(args['recurence']), 1, myWords, myDates)
                     else:
                         threadCombNext(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage,int(args['recurence']), 0, [], [])
+           #else:
+            #    initList(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage)
 
     else:
         initList(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage)
 
-    #Last Packing 
+    #Last Packing
     os.system("cat ./buffer/* > ./output.list && rm -f ./buffer/*")
     print("DONE : dictionary -> output.list")
 
