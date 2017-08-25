@@ -44,6 +44,7 @@ optional arguments:
 ## Exemple usage 
 
 ` genPwd.py -f myCsv.csv -r 2 -d 1 `
+
 This will generate all possible passwords without the re-use of information and which can be composed of maximum 3 different informations 
 
 ## CSV format
