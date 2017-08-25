@@ -5,6 +5,8 @@ It's a tool which generates a dictionary from a csv containing personal informat
 
 Generates all common passwords based on perso info. (leet transformations and combinatory processing)
 
+The purpose of the script is to test the usage of weak passwords.
+
 The script is written in PYTHON 3
 ## Exemple
 
@@ -33,7 +35,7 @@ optional arguments:
   -h, --help            show this help message and exit
   -f FILE, --file FILE  file wich contains personals datas
   -r RECURENCE, --recurence RECURENCE
-                        Number of iterations
+                        Number of iterations 0 to 2
   -b BRUTE, --brute BRUTE
                         Activate brute force, 1 to activate
   -d DIFFERENCE, --difference
