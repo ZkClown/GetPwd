@@ -49,7 +49,6 @@ This will generate all possible passwords without the re-use of information and 
 
 ## CSV format
 The csv has to contain 1 info per line !
-Dates must have the following format : dd/mm/yyyy (01/12/2012)
 
 ## CAUTION
 
