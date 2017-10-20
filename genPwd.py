@@ -48,10 +48,11 @@ if __name__=="__main__":
     #loadCSV
     dico = loadCsv("./csv/leetTab.csv",";")
     dicoMonth = loadCsv("./csv/date.csv",";")
+    dicoDepart = loadCsv("./csv/departements.csv", ";")
     loadPersonalsDatas(loadCsv(args["file"], ";"), dateList, wordList)
 
     #Generate all dates and leet
-    myWords = threadLauncher(wordList, dico)
+    myWords = threadLauncher(wordList, dico, dicoDepart)
     myDates = threadDateLauncher(dateList, dicoMonth)
 
 
