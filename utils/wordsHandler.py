@@ -57,6 +57,7 @@ class word:
                 for i in depart:
                     if not self.word.lower() == i.lower():
                         self.done.append(i)
+                break
 
 
 #------------------------------------------------------------------------------------------#
