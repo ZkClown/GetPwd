@@ -28,7 +28,7 @@ The script is written in PYTHON 3
 ## Usage
 ```
 git clone https://github.com/ZkClown/GetPwd.git
-cd ./GetPwd && mkdir ./buffer
+cd ./GetPwd
 genPwd.py [-h] -f FILE [-r RECURENCE] [-b BRUTE] [-d DIFFERENCE]
 
 optional arguments:
