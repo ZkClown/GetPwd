@@ -30,7 +30,9 @@ import os
 #----------------------------------Main----------------------------------------------------#
 
 if __name__=="__main__":
-
+    buffer = "./buffer"
+    if not os.path.exists(buffer):
+        os.makedirs(buffer)
     #init lists
     wordList = []
     dateList = []
