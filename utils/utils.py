@@ -42,15 +42,15 @@ def lolToSl(myWords):
             words.append(done)
     return words
 
-#Generate all possible strings from 1 char to 4 char (BF)
-def miniBf(string, list):
+#Generate all possible strings from 1 char to lenWill char (BF)
+def miniBf(string, list, lenWill):
     res = ""
-    dico = "abcdefghijklmnopqrstuvwxyz0123456789@&!:;,?./\\$*ù+-_=%µ£€()[]|~#\{\}@^"
-    if len(string)<4:
+    dico = r"abcdefghijklmnopqrstuvwxyz0123456789@&!:;,?./\\$*ù+-_=%µ£€()[]|~#\{\}@^"
+    if len(string)<lenWill:
         for char in dico:
             res = string + char
             list.append(res)
-            miniBf(res, list)
+            miniBf(res, list, lenWill)
 
 def RepresentsInt(s):
     try:

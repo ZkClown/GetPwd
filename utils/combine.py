@@ -168,7 +168,6 @@ def packNext(list, startValue,endValue,index, diff, myWords, myDates):
     pos = 0
     count = 0
     buff = []
-    jump = 1
     file = open("./buffer/"+str(index).zfill(3)+".txt","w")
     if diff != 1:
         for i in range(startValue, endValue):

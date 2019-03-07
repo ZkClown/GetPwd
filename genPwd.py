@@ -15,10 +15,10 @@
 
 #----------------------------------Imports-------------------------------------------------#
 
-from utils.utils import *
-from utils.wordsHandler import *
-from utils.datesHandler import *
-from utils.combine import *
+from utils.utils import miniBf, loadPersonalsDatas, loadCsv, lolToSl
+from utils.wordsHandler import threadLauncher
+from utils.datesHandler import threadDateLauncher, loadDatesWithSeparators
+from utils.combine import threadCombiner, threadCombNext,initList
 import argparse
 import os
 
@@ -42,9 +42,8 @@ if __name__=="__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("-f", "--file", required=True, help="file wich contains personals datas")
     ap.add_argument("-r", "--recurence", help="Number of iterations")
-    ap.add_argument("-b", "--brute", help="Activate brute force, 1 to active")
-    ap.add_argument("-d", "--difference", help="Activate the re usage of a same info more than once, 1 to activate")
-    arg = ap.parse_args()
+    ap.add_argument("-b", "--brute", help="Number of char to bruteforce if needed")
+    ap.add_argument("-d", "--difference", help="Don't combine two elements of one same set", action="store_true")
     args = vars(ap.parse_args())
 
     #loadCSV
@@ -57,19 +56,19 @@ if __name__=="__main__":
     myWords = threadLauncher(wordList, dico, dicoDepart)
     myDates = threadDateLauncher(dateList, dicoMonth)
 
-
-
-
     #brute force on 4 char
-    if arg.brute:
-        if args["brute"] == "1":
-            miniBf("", garbage)
+    if args["brute"]:
+        try:
+            miniBf("", garbage, int(args["brute"]))
+        except ValueError:
+            print("[ERROR] give an integer value for parameter \"brute\"")
+
 
     #iterations
-    if arg.recurence:
+    if args["recurence"]:
         if args["recurence"] in "012":
             if int(args["recurence"]) > 0:
-                if args["difference"] == "1":
+                if args["difference"]: 
                     threadCombiner(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage, 1, myWords, myDates)
                 else:
                     threadCombiner(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage, 0, [], [])

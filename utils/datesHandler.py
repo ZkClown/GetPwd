@@ -142,11 +142,8 @@ class date:
         self.done = temp
 
     def convertDoneInList(self):
-        now = datetime.datetime.now()
         res = [self]
         self.done2 = loadDatesWithSeparators(res)
-        #self.done2.remove(str(now.year))
-        #print(self.done)
 
     def reasignDone(self,list):
         self.done = list
@@ -213,5 +210,5 @@ def loadDatesWithSeparators(myDates):
                 res.append(dateFormated[0]+dateFormated[1]+dateFormated[2])
             else:
                 res.append(dateFormated[0])
-    #res.append(str(now.year))
+    res.append(str(now.year))
     return res
