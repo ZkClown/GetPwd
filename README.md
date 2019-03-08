@@ -29,21 +29,22 @@ The script is written in PYTHON 3
 ```
 git clone https://github.com/ZkClown/GetPwd.git
 cd ./GetPwd
-genPwd.py [-h] -f FILE [-r RECURENCE] [-b BRUTE] [-d DIFFERENCE]
+usage: genPwd.py [-h] -f FILE [-r RECURENCE] [-b BRUTE] [-p PROCESSES] [-d]
 
 optional arguments:
   -h, --help            show this help message and exit
   -f FILE, --file FILE  file wich contains personals datas
   -r RECURENCE, --recurence RECURENCE
-                        Number of iterations 0 to 2
+                        Number of iterations
   -b BRUTE, --brute BRUTE
-                        Activate brute force, 1 to activate
-  -d DIFFERENCE, --difference
-                        Deactivate the re usage of a same info more than once, 1 to deactivate
+                        Number of char to bruteforce if needed
+  -p PROCESSES, --processes PROCESSES
+                        Number of processes
+  -d, --difference      Don't combine two elements of one same set
 ```
 ## Exemple usage 
 
-` genPwd.py -f myCsv.csv -r 2 -d 1 `
+` genPwd.py -f myCsv.csv -r 2 -d `
 
 This will generate all possible passwords without the re-use of information and which can be composed of maximum 3 different informations 
 
