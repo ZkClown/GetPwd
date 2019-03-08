@@ -17,7 +17,7 @@
 
 from os import system, getcwd
 from multiprocessing import Process
-import re
+from re import sub
 
 #------------------------------------------------------------------------------------------#
 
@@ -229,7 +229,7 @@ def analyzeString(string, myWords, myDates):
                 break
     while temp != []:
         for x in temp:
-            if string[len(x[0]):] == re.sub(x[0], '', string):
+            if string[len(x[0]):] == sub(x[0], '', string):
                 res.append([x[1],pos])
                 pos+=1
                 temp.remove(x)
