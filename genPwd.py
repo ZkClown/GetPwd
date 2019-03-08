@@ -53,8 +53,11 @@ if __name__=="__main__":
     dico = loadCsv(baseDir+"/csv/leetTab.csv",";")
     dicoMonth = loadCsv(baseDir+"/csv/date.csv",";")
     dicoDepart = loadCsv(baseDir+"/csv/departements.csv", ";")
-    loadPersonalsDatas(loadCsv(args["file"], ";"), dateList, wordList)
-
+    try:
+        loadPersonalsDatas(loadCsv(args["file"], ";"), dateList, wordList)
+    except Exception:
+        print("[ERROR] File given doesn't exist or bad permissions")
+        exit(1)
     #Generate all dates and leet
     myWords = threadLauncher(wordList, dico, dicoDepart)
     myDates = threadDateLauncher(dateList, dicoMonth)
@@ -65,12 +68,13 @@ if __name__=="__main__":
             miniBf("", garbage, int(args["brute"]))
         except ValueError:
             print("[ERROR] give an integer value for parameter \"brute\"")
-    
+            exit(1)
+
     try:
         nbProcess = int(args["processes"])
     except ValueError:
         print("[ERROR] give an integer value for parameter \"processes\"")
-
+        exit(1)
     #iterations
     if args["recurence"]:
         if args["recurence"] in "012":
