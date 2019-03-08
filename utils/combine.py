@@ -15,8 +15,8 @@
 
 #----------------------------------Imports-------------------------------------------------#
 
-import os
-from threading import Thread
+from os import system, getcwd
+from multiprocessing import Process
 import re
 
 #------------------------------------------------------------------------------------------#
@@ -24,11 +24,11 @@ import re
 
 
 
-#----------------------------------Threads-------------------------------------------------#
+#----------------------------------Processs-------------------------------------------------#
 
-class partCombine(Thread):
+class partCombine(Process):
     def __init__(self,list, begValue, end, index, diff, myWords, myDates):
-        Thread.__init__(self)
+        Process.__init__(self)
         self.begValue = begValue
         self.end = end
         self.index = index
@@ -41,9 +41,9 @@ class partCombine(Thread):
     def run(self):
         packing(self.list, self.begValue, self.end, self.index, self.diff, self.myWords, self.myDates)
 
-class partCombNext(Thread):
+class partCombNext(Process):
     def __init__(self,list, begValue, end, index, diff, myWords, myDates):
-        Thread.__init__(self)
+        Process.__init__(self)
         self.begValue = begValue
         self.end = end
         self.index = index
@@ -61,49 +61,51 @@ class partCombNext(Thread):
 
 
 
-#----------------------------------Thread Launchers----------------------------------------#
+#----------------------------------Process Launchers----------------------------------------#
 
-def threadCombiner(list, diff, myWords, myDates):
+def processCombiner(list, diff, myWords, myDates, nbProcess):
+    baseDir = getcwd()
     initList(list)
     lastValue = 0
-    threadNumber = 1
-    step = int(len(list)/3)
+    processNumber = 1
+    step = int(len(list)/nbProcess)
     tmp = []
     for i in range(1,len(list)):
         if(i%step == 0):
-            tmp.append(partCombine(list, lastValue, i, threadNumber, diff, myWords, myDates))
+            tmp.append(partCombine(list, lastValue, i, processNumber, diff, myWords, myDates))
             lastValue = i
-            threadNumber += 1
+            processNumber += 1
     if(lastValue != len(list)-1):
-        tmp.append(partCombine(list, lastValue, len(list), threadNumber, diff, myWords, myDates))
-    for thread in tmp:
-        thread.start()
-    print("Fin lancement thread")
-    for thread in tmp:
-        thread.join()
+        tmp.append(partCombine(list, lastValue, len(list), processNumber, diff, myWords, myDates))
+    for process in tmp:
+        process.start()
+    print("Processes Launched")
+    for process in tmp:
+        process.join()
     print("Packing")
-    os.system("cat ./buffer/*.txt > ./buffer/output && rm ./buffer/*.txt")
+    system("/bin/cat "+baseDir+"/buffer/*.txt > "+baseDir+"/buffer/output && /bin/rm "+baseDir+"/buffer/*.txt")
 
-def threadCombNext(list, rec, diff, myWords, myDates):
+def processCombNext(list, rec, diff, myWords, myDates, nbProcess):
+    baseDir = getcwd()
     for j in range(1,rec):
         lastValue = 0
-        threadNumber = 0
-        step = int(len(list)/3)
+        processNumber = 0
+        step = int(len(list)/nbProcess)
         tmp = []
         for i in range(1,len(list)):
             if(i%step == 0):
-                tmp.append(partCombNext(list, lastValue, i, threadNumber, diff, myWords, myDates))
+                tmp.append(partCombNext(list, lastValue, i, processNumber, diff, myWords, myDates))
                 lastValue = i
-                threadNumber += 1
+                processNumber += 1
         if(lastValue != len(list)-1):
-            tmp.append(partCombNext(list, lastValue, len(list), threadNumber, diff, myWords, myDates))
-        for thread in tmp:
-            thread.start()
-        print("Fin lancement thread")
-        for thread in tmp:
-            thread.join()
+            tmp.append(partCombNext(list, lastValue, len(list), processNumber, diff, myWords, myDates))
+        for process in tmp:
+            process.start()
+        print("Processes Launched")
+        for process in tmp:
+            process.join()
         print("Packing")
-        os.system("cat ./buffer/*.txt > ./buffer/output"+str(j)+" && rm ./buffer/*.txt")
+        system("/bin/cat "+baseDir+"/buffer/*.txt > "+baseDir+"/buffer/output"+str(j)+" && /bin/rm "+baseDir+"/buffer/*.txt")
 
 #------------------------------------------------------------------------------------------#
 
@@ -113,12 +115,14 @@ def threadCombNext(list, rec, diff, myWords, myDates):
 #----------------------------------Writing-------------------------------------------------#
 
 def initList(list):
-    file = open("./buffer/000","w")
+    baseDir = getcwd()
+    file = open(baseDir+"/buffer/000","w")
     for word in list:
         file.write(word+"\n")
     file.close()
 
 def packing(list, start, end, index, diff , myWords, myDates):
+    baseDir = getcwd()
     for date in myDates:
         date.convertDoneInList()
     for word in myWords:
@@ -126,7 +130,7 @@ def packing(list, start, end, index, diff , myWords, myDates):
     flag2 = 0
     j = 0
     temp = ""
-    file = open("./buffer/"+str(index).zfill(3)+".txt","w")
+    file = open(baseDir+"/buffer/"+str(index).zfill(3)+".txt","w")
     if diff != 1:
         for i in range(start,end):
             for j in range(0,len(list)):
@@ -158,6 +162,7 @@ def packing(list, start, end, index, diff , myWords, myDates):
     file.close()
 
 def packNext(list, startValue,endValue,index, diff, myWords, myDates):
+    baseDir = getcwd()
     for date in myDates:
         date.convertDoneInList()
     for word in myWords:
@@ -168,15 +173,15 @@ def packNext(list, startValue,endValue,index, diff, myWords, myDates):
     pos = 0
     count = 0
     buff = []
-    file = open("./buffer/"+str(index).zfill(3)+".txt","w")
+    file = open(baseDir+"/buffer/"+str(index).zfill(3)+".txt","w")
     if diff != 1:
         for i in range(startValue, endValue):
-            file2 = open("./buffer/output", "r")
+            file2 = open(baseDir+"/buffer/output", "r")
             for line in file2:
                 file.write(list[i]+line)
     else:
         for i in range(startValue, endValue):
-            file2 = open("./buffer/output", "r")
+            file2 = open(baseDir+"/buffer/output", "r")
             for line in file2:
                 if flag2 == 0:
                     if flag == 0:

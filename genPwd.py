@@ -18,9 +18,10 @@
 from utils.utils import miniBf, loadPersonalsDatas, loadCsv, lolToSl
 from utils.wordsHandler import threadLauncher
 from utils.datesHandler import threadDateLauncher, loadDatesWithSeparators
-from utils.combine import threadCombiner, threadCombNext,initList
+from utils.combine import processCombiner, processCombNext,initList
+from os import getcwd, system, makedirs
+from os.path import exists
 import argparse
-import os
 
 #------------------------------------------------------------------------------------------#
 
@@ -30,9 +31,10 @@ import os
 #----------------------------------Main----------------------------------------------------#
 
 if __name__=="__main__":
-    buffer = "./buffer"
-    if not os.path.exists(buffer):
-        os.makedirs(buffer)
+    baseDir = getcwd()
+    buffer = baseDir+"/buffer"
+    if not exists(buffer):
+        makedirs(buffer)
     #init lists
     wordList = []
     dateList = []
@@ -43,13 +45,14 @@ if __name__=="__main__":
     ap.add_argument("-f", "--file", required=True, help="file wich contains personals datas")
     ap.add_argument("-r", "--recurence", help="Number of iterations")
     ap.add_argument("-b", "--brute", help="Number of char to bruteforce if needed")
+    ap.add_argument("-p", "--processes", help="Number of processes", default = 2)
     ap.add_argument("-d", "--difference", help="Don't combine two elements of one same set", action="store_true")
     args = vars(ap.parse_args())
 
     #loadCSV
-    dico = loadCsv("./csv/leetTab.csv",";")
-    dicoMonth = loadCsv("./csv/date.csv",";")
-    dicoDepart = loadCsv("./csv/departements.csv", ";")
+    dico = loadCsv(baseDir+"/csv/leetTab.csv",";")
+    dicoMonth = loadCsv(baseDir+"/csv/date.csv",";")
+    dicoDepart = loadCsv(baseDir+"/csv/departements.csv", ";")
     loadPersonalsDatas(loadCsv(args["file"], ";"), dateList, wordList)
 
     #Generate all dates and leet
@@ -62,21 +65,25 @@ if __name__=="__main__":
             miniBf("", garbage, int(args["brute"]))
         except ValueError:
             print("[ERROR] give an integer value for parameter \"brute\"")
-
+    
+    try:
+        nbProcess = int(args["processes"])
+    except ValueError:
+        print("[ERROR] give an integer value for parameter \"processes\"")
 
     #iterations
     if args["recurence"]:
         if args["recurence"] in "012":
             if int(args["recurence"]) > 0:
-                if args["difference"]: 
-                    threadCombiner(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage, 1, myWords, myDates)
+                if args["difference"]:
+                    processCombiner(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage, 1, myWords, myDates, nbProcess)
                 else:
-                    threadCombiner(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage, 0, [], [])
+                    processCombiner(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage, 0, [], [], nbProcess)
                 if int(args["recurence"]) > 1:
-                    if args["difference"] == "1":
-                        threadCombNext(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage,int(args['recurence']), 1, myWords, myDates)
+                    if args["difference"]:
+                        processCombNext(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage,int(args['recurence']), 1, myWords, myDates, nbProcess)
                     else:
-                        threadCombNext(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage,int(args['recurence']), 0, [], [])
+                        processCombNext(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage,int(args['recurence']), 0, [], [], nbProcess)
            #else:
             #    initList(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage)
 
@@ -84,7 +91,7 @@ if __name__=="__main__":
         initList(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage)
 
     #Last Packing
-    os.system("cat ./buffer/* > ./output.list && rm -f ./buffer/*")
+    system("/bin/cat "+buffer+"/* > "+baseDir+"/output.list && /bin/rm -f "+buffer+"/*")
     print("DONE : dictionary -> output.list")
 
 #------------------------------------------------------------------------------------------#
