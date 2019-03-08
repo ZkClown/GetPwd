@@ -94,9 +94,9 @@ if __name__=="__main__":
                     processCombiner(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage, 0, [], [], nbProcess)
                 if recurence > 1:
                     if args["difference"]:
-                        processCombNext(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage,int(args['recurence']), 1, myWords, myDates, nbProcess)
+                        processCombNext(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage,recurence, 1, myWords, myDates, nbProcess)
                     else:
-                        processCombNext(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage,int(args['recurence']), 0, [], [], nbProcess)
+                        processCombNext(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage,recurence, 0, [], [], nbProcess)
             else:
                 initList(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage)
 
