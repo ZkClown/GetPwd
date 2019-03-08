@@ -75,21 +75,34 @@ if __name__=="__main__":
     except ValueError:
         print("[ERROR] give an integer value for parameter \"processes\"")
         exit(1)
-    #iterations
+    
+
+    
+
     if args["recurence"]:
-        if args["recurence"] in "012":
-            if int(args["recurence"]) > 0:
+        try:
+            recurence = int(args["recurence"])
+        except ValueError:
+            print("[ERROR] give an integer between 0 and 2 for parameter \"recurence\"")
+            exit(1)
+        
+        if recurence >= 0 and recurence <= 2:
+            if recurence > 0:
                 if args["difference"]:
                     processCombiner(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage, 1, myWords, myDates, nbProcess)
                 else:
                     processCombiner(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage, 0, [], [], nbProcess)
-                if int(args["recurence"]) > 1:
+                if recurence > 1:
                     if args["difference"]:
                         processCombNext(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage,int(args['recurence']), 1, myWords, myDates, nbProcess)
                     else:
                         processCombNext(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage,int(args['recurence']), 0, [], [], nbProcess)
-           #else:
-            #    initList(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage)
+            else:
+                initList(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage)
+
+        else:
+            print("[ERROR] give an integer between 0 and 2 for parameter \"recurence\"")
+            exit(1)
 
     else:
         initList(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage)
