@@ -15,7 +15,7 @@
 
 #----------------------------------Imports-------------------------------------------------#
 
-from utils.utils import miniBf, loadPersonalsDatas, loadCsv, lolToSl
+from utils.utils import miniBf, loadPersonalsDatas, loadCsv, lolToSl, colors
 from utils.wordsHandler import threadLauncher
 from utils.datesHandler import threadDateLauncher, loadDatesWithSeparators
 from utils.combine import processCombiner, processCombNext,initList
@@ -31,10 +31,13 @@ import argparse
 #----------------------------------Main----------------------------------------------------#
 
 if __name__=="__main__":
+    # Set buffer folder. Create it if not exists and rm the content.
     baseDir = getcwd()
     buffer = baseDir+"/buffer"
     if not exists(buffer):
         makedirs(buffer)
+    system("/bin/rm -rf "+buffer+"/*")
+    
     #init lists
     wordList = []
     dateList = []
@@ -56,7 +59,7 @@ if __name__=="__main__":
     try:
         loadPersonalsDatas(loadCsv(args["file"], ";"), dateList, wordList)
     except Exception:
-        print("[ERROR] File given doesn't exist or bad permissions")
+        print(colors.red+"[ERROR]: "+colors.rst+"File given doesn't exist or bad permissions")
         exit(1)
     #Generate all dates and leet
     myWords = threadLauncher(wordList, dico, dicoDepart)
@@ -67,13 +70,13 @@ if __name__=="__main__":
         try:
             miniBf("", garbage, int(args["brute"]))
         except ValueError:
-            print("[ERROR] give an integer value for parameter \"brute\"")
+            print(colors.red+"[ERROR]: "+colors.rst+"give an integer value for parameter \"brute\"")
             exit(1)
 
     try:
         nbProcess = int(args["processes"])
     except ValueError:
-        print("[ERROR] give an integer value for parameter \"processes\"")
+        print(colors.red+"[ERROR]: "+colors.rst+"give an integer value for parameter \"processes\"")
         exit(1)
     
 
@@ -83,7 +86,7 @@ if __name__=="__main__":
         try:
             recurence = int(args["recurence"])
         except ValueError:
-            print("[ERROR] give an integer between 0 and 2 for parameter \"recurence\"")
+            print(colors.red+"[ERROR]: "+colors.rst+"give an integer between 0 and 2 for parameter \"recurence\"")
             exit(1)
         
         if recurence >= 0 and recurence <= 2:
@@ -101,7 +104,7 @@ if __name__=="__main__":
                 initList(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage)
 
         else:
-            print("[ERROR] give an integer between 0 and 2 for parameter \"recurence\"")
+            print(colors.red+"[ERROR]: "+colors.rst+"give an integer between 0 and 2 for parameter \"recurence\"")
             exit(1)
 
     else:
@@ -109,6 +112,6 @@ if __name__=="__main__":
 
     #Last Packing
     system("/bin/cat "+buffer+"/* > "+baseDir+"/output.list && /bin/rm -f "+buffer+"/*")
-    print("DONE : dictionary -> output.list")
+    print(colors.green+"DONE: "+colors.rst+"dictionary -> output.list")
 
 #------------------------------------------------------------------------------------------#

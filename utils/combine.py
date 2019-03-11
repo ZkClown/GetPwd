@@ -18,6 +18,7 @@
 from os import system, getcwd
 from multiprocessing import Process
 from re import sub
+from utils.utils import colors
 
 #------------------------------------------------------------------------------------------#
 
@@ -64,29 +65,38 @@ class partCombNext(Process):
 #----------------------------------Process Launchers----------------------------------------#
 
 def processCombiner(list, diff, myWords, myDates, nbProcess):
+    print(colors.green+"[First Combine]")
     baseDir = getcwd()
     initList(list)
     lastValue = 0
     processNumber = 1
     step = int(len(list)/nbProcess)
     tmp = []
+    
     for i in range(1,len(list)):
         if(i%step == 0):
             tmp.append(partCombine(list, lastValue, i, processNumber, diff, myWords, myDates))
             lastValue = i
             processNumber += 1
+    
     if(lastValue != len(list)-1):
         tmp.append(partCombine(list, lastValue, len(list), processNumber, diff, myWords, myDates))
-    for process in tmp:
+    
+    for index,process in enumerate(tmp):
         process.start()
-    print("Processes Launched")
+        print(colors.green + "[Combine 1]: "+colors.rst+"Process %d Launched" % (index))
+    
     for process in tmp:
         process.join()
-    print("Packing")
+    print(colors.green+"[Combine 1]: "+colors.rst+"Processes' job done. Packing!")
+    
     system("/bin/cat "+baseDir+"/buffer/*.txt > "+baseDir+"/buffer/output && /bin/rm "+baseDir+"/buffer/*.txt")
+    print(colors.green+"[First Combine Done!]\n")
 
 def processCombNext(list, rec, diff, myWords, myDates, nbProcess):
+    print(colors.green+"[Second Combine]")
     baseDir = getcwd()
+    
     for j in range(1,rec):
         lastValue = 0
         processNumber = 0
@@ -97,15 +107,20 @@ def processCombNext(list, rec, diff, myWords, myDates, nbProcess):
                 tmp.append(partCombNext(list, lastValue, i, processNumber, diff, myWords, myDates))
                 lastValue = i
                 processNumber += 1
+        
         if(lastValue != len(list)-1):
             tmp.append(partCombNext(list, lastValue, len(list), processNumber, diff, myWords, myDates))
-        for process in tmp:
+        
+        for index,process in enumerate(tmp):
             process.start()
-        print("Processes Launched")
+            print(colors.green + "[Combine 2]: "+colors.rst+"Process %d Launched" % (index))
+        
         for process in tmp:
             process.join()
-        print("Packing")
+        print(colors.green+"[Combine 2]: "+colors.rst+"Processes' job done. Packing!")
+        
         system("/bin/cat "+baseDir+"/buffer/*.txt > "+baseDir+"/buffer/output"+str(j)+" && /bin/rm "+baseDir+"/buffer/*.txt")
+        print(colors.green+"[Second Combine Done!]\n")
 
 #------------------------------------------------------------------------------------------#
 

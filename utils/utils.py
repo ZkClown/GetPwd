@@ -24,6 +24,13 @@ import csv
 
 #----------------------------------Utils---------------------------------------------------#
 
+# Colors for the outputs
+class colors(object):
+    red   = "\033[1;32;31m"
+    green = "\033[1;32;32m"
+    rst   = "\033[1;32;0m"
+
+
 #Take the leet table and juste get the lines usefull
 def getSmallDic(word, dictionary):
     res = []
