@@ -52,7 +52,8 @@ def lolToSl(myWords):
 #Generate all possible strings from 1 char to lenWill char (BF)
 def miniBf(string, list, lenWill):
     res = ""
-    dico = r"abcdefghijklmnopqrstuvwxyz0123456789@&!:;,?./\\$*ù+-_=%µ£€()[]|~#\{\}@^"
+    dico = r"@&!:;,?./\\$*+-_=%€()[]|#\{\}"
+    # dico = r"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@&!:;,?./\\$*ù+-_=%µ£€()[]|~#\{\}^"
     if len(string)<lenWill:
         for char in dico:
             res = string + char

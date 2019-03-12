@@ -17,7 +17,7 @@
 
 from os import system, getcwd
 from multiprocessing import Process
-from re import sub
+from re import sub, escape
 from utils.utils import colors
 
 #------------------------------------------------------------------------------------------#
@@ -188,16 +188,16 @@ def packNext(list, startValue,endValue,index, diff, myWords, myDates):
     pos = 0
     count = 0
     buff = []
-    file = open(baseDir+"/buffer/"+str(index).zfill(3)+".txt","w")
+    fileOut = open(baseDir+"/buffer/"+str(index).zfill(3)+".txt","w")
     if diff != 1:
         for i in range(startValue, endValue):
-            file2 = open(baseDir+"/buffer/output", "r")
-            for line in file2:
-                file.write(list[i]+line)
+            fileIn = open(baseDir+"/buffer/output", "r")
+            for line in fileIn:
+                fileOut.write(list[i]+line)
     else:
         for i in range(startValue, endValue):
-            file2 = open(baseDir+"/buffer/output", "r")
-            for line in file2:
+            fileIn = open(baseDir+"/buffer/output", "r")
+            for line in fileIn:
                 if flag2 == 0:
                     if flag == 0:
                         buff = analyzeString(line[:-1], myWords, myDates)
@@ -211,22 +211,22 @@ def packNext(list, startValue,endValue,index, diff, myWords, myDates):
                                     numLine = count + len(word[0].done2) - 1
                                 break
                         if flag == 0:
-                            file.write(list[i]+line)
+                            fileOut.write(list[i]+line)
                             numLine = count + len(buff[-1][0].done2) - 1
                             flag2 = 1
                     else:
                         if count == numLine:
                             flag = 0
                 else:
-                    file.write(list[i]+line)
+                    fileOut.write(list[i]+line)
                     if count == numLine:
                         flag2 = 0
 
 
                 count += 1
             count = 0
-            file2.close()
-    file.close()
+            fileIn.close()
+    fileOut.close()
 
 
 def analyzeString(string, myWords, myDates):
@@ -241,15 +241,18 @@ def analyzeString(string, myWords, myDates):
         for x in word.done2:
             if x in string:
                 temp.append([x,word])
-                break
-    while temp != []:
+
+    while temp != []: 
+        if string == "":
+            break
         for x in temp:
-            if string[len(x[0]):] == sub(x[0], '', string):
+            if string[len(x[0]):] == sub(escape(x[0]), '', string):
                 res.append([x[1],pos])
                 pos+=1
                 temp.remove(x)
                 string = string[len(x[0]):]
                 break
+        
     return res
 
 
