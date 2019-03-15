@@ -19,8 +19,8 @@ from utils.utils import miniBf, loadPersonalsDatas, loadCsv, lolToSl, colors, ga
 from utils.wordsHandler import threadLauncher
 from utils.datesHandler import threadDateLauncher, loadDatesWithSeparators
 from utils.combine import processCombiner, processCombNext,initList
-from os import getcwd, system, makedirs
-from os.path import exists
+from os import system, makedirs
+from os.path import exists, dirname, realpath
 import argparse
 
 #------------------------------------------------------------------------------------------#
@@ -32,7 +32,7 @@ import argparse
 
 if __name__=="__main__":
     # Set buffer folder. Create it if not exists and rm the content.
-    baseDir = getcwd()
+    baseDir = dirname(realpath(__file__))
     buffer = baseDir+"/buffer"
     if not exists(buffer):
         makedirs(buffer)
@@ -49,6 +49,7 @@ if __name__=="__main__":
     ap.add_argument("-r", "--recurence", help="Number of iterations")
     ap.add_argument("-b", "--brute", help="Number of char to bruteforce if needed")
     ap.add_argument("-c", "--charset", help="Charset used for the bruteforce")
+    ap.add_argument("-o", "--output", help="Output file", default = baseDir+"/output.list")
     ap.add_argument("-p", "--processes", help="Number of processes", default = 2)
     ap.add_argument("-d", "--difference", help="Don't combine two elements of one same set", action="store_true")
     args = vars(ap.parse_args())
@@ -113,7 +114,7 @@ if __name__=="__main__":
         initList(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage)
 
     #Last Packing
-    system("/bin/cat "+buffer+"/* > "+baseDir+"/output.list && /bin/rm -f "+buffer+"/*")
-    print(colors.green+"DONE: "+colors.rst+"dictionary -> output.list")
+    system("/bin/cat "+buffer+"/* > "+args["output"]+" && /bin/rm -f "+buffer+"/*")
+    print(colors.green+"DONE: "+colors.rst+"dictionary -> "+args["output"])
 
 #------------------------------------------------------------------------------------------#

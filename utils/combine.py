@@ -15,7 +15,8 @@
 
 #----------------------------------Imports-------------------------------------------------#
 
-from os import system, getcwd
+from os import system
+from os.path import dirname, realpath
 from multiprocessing import Process
 from re import sub, escape
 from utils.utils import colors
@@ -68,7 +69,7 @@ class partCombNext(Process):
 
 def processCombiner(list, diff, myWords, myDates, myGarbage, nbProcess):
     print(colors.green+"[First Combine]")
-    baseDir = getcwd()
+    baseDir = dirname(realpath(__file__))[:-len("/utils")]
     initList(list)
     lastValue = 0
     processNumber = 1
@@ -97,8 +98,7 @@ def processCombiner(list, diff, myWords, myDates, myGarbage, nbProcess):
 
 def processCombNext(list, rec, diff, myWords, myDates, myGarbage,nbProcess):
     print(colors.green+"[Second Combine]")
-    baseDir = getcwd()
-    
+    baseDir = dirname(realpath(__file__))[:-len("/utils")]    
     for j in range(1,rec):
         lastValue = 0
         processNumber = 0
@@ -132,14 +132,15 @@ def processCombNext(list, rec, diff, myWords, myDates, myGarbage,nbProcess):
 #----------------------------------Writing-------------------------------------------------#
 
 def initList(list):
-    baseDir = getcwd()
+    baseDir = dirname(realpath(__file__))[:-len("/utils")]
+    print(baseDir)
     file = open(baseDir+"/buffer/000","w")
     for word in list:
         file.write(word+"\n")
     file.close()
 
 def packing(list, start, end, index, diff , myWords, myDates, myGarbage):
-    baseDir = getcwd()
+    baseDir = dirname(realpath(__file__))[:-len("/utils")]
     for date in myDates:
         date.convertDoneInList()
     for word in myWords:
@@ -179,7 +180,7 @@ def packing(list, start, end, index, diff , myWords, myDates, myGarbage):
     file.close()
 
 def packNext(list, startValue,endValue,index, diff, myWords, myDates, myGarbage):
-    baseDir = getcwd()
+    baseDir =dirname(realpath(__file__))
     for date in myDates:
         date.convertDoneInList()
     for word in myWords:
