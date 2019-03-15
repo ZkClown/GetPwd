@@ -29,7 +29,9 @@ The script is written in PYTHON 3
 ```
 git clone https://github.com/ZkClown/GetPwd.git
 cd ./GetPwd
-usage: genPwd.py [-h] -f FILE [-r RECURENCE] [-b BRUTE] [-p PROCESSES] [-d]
+python genPwd.py -h
+usage: genPwd.py [-h] -f FILE [-r RECURENCE] [-b BRUTE] [-c CHARSET]
+                 [-p PROCESSES] [-d]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -38,15 +40,18 @@ optional arguments:
                         Number of iterations
   -b BRUTE, --brute BRUTE
                         Number of char to bruteforce if needed
+  -c CHARSET, --charset CHARSET
+                        Charset used for the bruteforce
   -p PROCESSES, --processes PROCESSES
                         Number of processes
   -d, --difference      Don't combine two elements of one same set
+
 ```
 ## Exemple usage 
 
-` genPwd.py -f myCsv.csv -r 2 -d `
+` genPwd.py -f myCsv.csv -r 2 -d -b 2 -c "abc" -p 4`
 
-This will generate all possible passwords without the re-use of information and which can be composed of maximum 3 different informations 
+This will generate all possible passwords without the re-use of information with garbages chars using the charset "abc" up to 3 chars and which can be composed of maximum 3 different informations. 
 
 ## CSV format
 The csv has to contain 1 info per line !
