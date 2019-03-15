@@ -57,7 +57,7 @@ def lolToSl(myWords):
 def miniBf(string, list, lenWill, charset):
     res = ""
     if not charset: 
-        dico = r"0123456789@&!:;,?./\\$*+-_=%€()[]|#\{\}"
+        dico = r"0123456789!?*.#@"
     else:
         dico = charset
     if len(string)<lenWill:

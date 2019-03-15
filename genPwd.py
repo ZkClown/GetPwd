@@ -69,18 +69,17 @@ if __name__=="__main__":
     #brute force on 4 char
     if args["brute"]:
         try:
-            print(args["charset"])
             miniBf("", garbage, int(args["brute"]), args["charset"])
         except ValueError:
             print(colors.red+"[ERROR]: "+colors.rst+"give an integer value for parameter \"brute\"")
             exit(1)
-        myGarbage = [garbageObject(garbage)]
 
     try:
         nbProcess = int(args["processes"])
     except ValueError:
         print(colors.red+"[ERROR]: "+colors.rst+"give an integer value for parameter \"processes\"")
         exit(1)
+    myGarbage = [garbageObject(garbage)]
     
 
     
