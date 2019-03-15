@@ -15,7 +15,7 @@
 
 #----------------------------------Imports-------------------------------------------------#
 
-from utils.utils import miniBf, loadPersonalsDatas, loadCsv, lolToSl, colors
+from utils.utils import miniBf, loadPersonalsDatas, loadCsv, lolToSl, colors, garbageObject
 from utils.wordsHandler import threadLauncher
 from utils.datesHandler import threadDateLauncher, loadDatesWithSeparators
 from utils.combine import processCombiner, processCombNext,initList
@@ -48,6 +48,7 @@ if __name__=="__main__":
     ap.add_argument("-f", "--file", required=True, help="file wich contains personals datas")
     ap.add_argument("-r", "--recurence", help="Number of iterations")
     ap.add_argument("-b", "--brute", help="Number of char to bruteforce if needed")
+    ap.add_argument("-c", "--charset", help="Charset used for the bruteforce")
     ap.add_argument("-p", "--processes", help="Number of processes", default = 2)
     ap.add_argument("-d", "--difference", help="Don't combine two elements of one same set", action="store_true")
     args = vars(ap.parse_args())
@@ -68,10 +69,12 @@ if __name__=="__main__":
     #brute force on 4 char
     if args["brute"]:
         try:
-            miniBf("", garbage, int(args["brute"]))
+            print(args["charset"])
+            miniBf("", garbage, int(args["brute"]), args["charset"])
         except ValueError:
             print(colors.red+"[ERROR]: "+colors.rst+"give an integer value for parameter \"brute\"")
             exit(1)
+        myGarbage = [garbageObject(garbage)]
 
     try:
         nbProcess = int(args["processes"])
@@ -92,14 +95,14 @@ if __name__=="__main__":
         if recurence >= 0 and recurence <= 2:
             if recurence > 0:
                 if args["difference"]:
-                    processCombiner(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage, 1, myWords, myDates, nbProcess)
+                    processCombiner(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage, 1, myWords, myDates,myGarbage, nbProcess)
                 else:
-                    processCombiner(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage, 0, [], [], nbProcess)
+                    processCombiner(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage, 0, [], [], [],nbProcess)
                 if recurence > 1:
                     if args["difference"]:
-                        processCombNext(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage,recurence, 1, myWords, myDates, nbProcess)
+                        processCombNext(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage,recurence, 1, myWords, myDates,myGarbage ,nbProcess)
                     else:
-                        processCombNext(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage,recurence, 0, [], [], nbProcess)
+                        processCombNext(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage,recurence, 0, [], [],[] ,nbProcess)
             else:
                 initList(lolToSl(myWords)+loadDatesWithSeparators(myDates)+garbage)
 

@@ -30,6 +30,10 @@ class colors(object):
     green = "\033[1;32;32m"
     rst   = "\033[1;32;0m"
 
+class garbageObject:
+    #Initialisation
+    def __init__(self, myList):
+        self.done2 = myList
 
 #Take the leet table and juste get the lines usefull
 def getSmallDic(word, dictionary):
@@ -50,15 +54,17 @@ def lolToSl(myWords):
     return words
 
 #Generate all possible strings from 1 char to lenWill char (BF)
-def miniBf(string, list, lenWill):
+def miniBf(string, list, lenWill, charset):
     res = ""
-    dico = r"@&!:;,?./\\$*+-_=%€()[]|#\{\}"
-    # dico = r"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@&!:;,?./\\$*ù+-_=%µ£€()[]|~#\{\}^"
+    if not charset: 
+        dico = r"0123456789@&!:;,?./\\$*+-_=%€()[]|#\{\}"
+    else:
+        dico = charset
     if len(string)<lenWill:
         for char in dico:
             res = string + char
             list.append(res)
-            miniBf(res, list, lenWill)
+            miniBf(res, list, lenWill, charset)
 
 def RepresentsInt(s):
     try:

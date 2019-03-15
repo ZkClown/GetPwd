@@ -28,7 +28,7 @@ from utils.utils import colors
 #----------------------------------Processs-------------------------------------------------#
 
 class partCombine(Process):
-    def __init__(self,list, begValue, end, index, diff, myWords, myDates):
+    def __init__(self,list, begValue, end, index, diff, myWords, myDates, myGarbage):
         Process.__init__(self)
         self.begValue = begValue
         self.end = end
@@ -37,13 +37,14 @@ class partCombine(Process):
         self.diff = diff
         self.myWords = myWords
         self.myDates = myDates
+        self.myGarbage = myGarbage
         super(partCombine, self).__init__()
 
     def run(self):
-        packing(self.list, self.begValue, self.end, self.index, self.diff, self.myWords, self.myDates)
+        packing(self.list, self.begValue, self.end, self.index, self.diff, self.myWords, self.myDates, self.myGarbage)
 
 class partCombNext(Process):
-    def __init__(self,list, begValue, end, index, diff, myWords, myDates):
+    def __init__(self,list, begValue, end, index, diff, myWords, myDates, myGarbage):
         Process.__init__(self)
         self.begValue = begValue
         self.end = end
@@ -52,10 +53,11 @@ class partCombNext(Process):
         self.diff = diff
         self.myWords = myWords
         self.myDates = myDates
+        self.myGarbage = myGarbage
         super(partCombNext, self).__init__()
 
     def run(self):
-        packNext(self.list, self.begValue, self.end, self.index, self.diff, self.myWords, self.myDates)
+        packNext(self.list, self.begValue, self.end, self.index, self.diff, self.myWords, self.myDates,self.myGarbage)
 
 #------------------------------------------------------------------------------------------#
 
@@ -64,7 +66,7 @@ class partCombNext(Process):
 
 #----------------------------------Process Launchers----------------------------------------#
 
-def processCombiner(list, diff, myWords, myDates, nbProcess):
+def processCombiner(list, diff, myWords, myDates, myGarbage, nbProcess):
     print(colors.green+"[First Combine]")
     baseDir = getcwd()
     initList(list)
@@ -75,12 +77,12 @@ def processCombiner(list, diff, myWords, myDates, nbProcess):
     
     for i in range(1,len(list)):
         if(i%step == 0):
-            tmp.append(partCombine(list, lastValue, i, processNumber, diff, myWords, myDates))
+            tmp.append(partCombine(list, lastValue, i, processNumber, diff, myWords, myDates, myGarbage))
             lastValue = i
             processNumber += 1
     
     if(lastValue != len(list)-1):
-        tmp.append(partCombine(list, lastValue, len(list), processNumber, diff, myWords, myDates))
+        tmp.append(partCombine(list, lastValue, len(list), processNumber, diff, myWords, myDates,myGarbage))
     
     for index,process in enumerate(tmp):
         process.start()
@@ -93,7 +95,7 @@ def processCombiner(list, diff, myWords, myDates, nbProcess):
     system("/bin/cat "+baseDir+"/buffer/*.txt > "+baseDir+"/buffer/output && /bin/rm "+baseDir+"/buffer/*.txt")
     print(colors.green+"[First Combine Done!]\n")
 
-def processCombNext(list, rec, diff, myWords, myDates, nbProcess):
+def processCombNext(list, rec, diff, myWords, myDates, myGarbage,nbProcess):
     print(colors.green+"[Second Combine]")
     baseDir = getcwd()
     
@@ -104,12 +106,12 @@ def processCombNext(list, rec, diff, myWords, myDates, nbProcess):
         tmp = []
         for i in range(1,len(list)):
             if(i%step == 0):
-                tmp.append(partCombNext(list, lastValue, i, processNumber, diff, myWords, myDates))
+                tmp.append(partCombNext(list, lastValue, i, processNumber, diff, myWords, myDates, myGarbage))
                 lastValue = i
                 processNumber += 1
         
         if(lastValue != len(list)-1):
-            tmp.append(partCombNext(list, lastValue, len(list), processNumber, diff, myWords, myDates))
+            tmp.append(partCombNext(list, lastValue, len(list), processNumber, diff, myWords, myDates, myGarbage))
         
         for index,process in enumerate(tmp):
             process.start()
@@ -136,7 +138,7 @@ def initList(list):
         file.write(word+"\n")
     file.close()
 
-def packing(list, start, end, index, diff , myWords, myDates):
+def packing(list, start, end, index, diff , myWords, myDates, myGarbage):
     baseDir = getcwd()
     for date in myDates:
         date.convertDoneInList()
@@ -154,7 +156,7 @@ def packing(list, start, end, index, diff , myWords, myDates):
         for i in range(start,end):
             while j < len(list):
                 if flag2 == 0:
-                    for word in myWords+myDates:
+                    for word in myWords+myDates+myGarbage:
                         if list[i] in word.done2 and list[j] in word.done2:
                             j += len(word.done2)
                             break
@@ -176,7 +178,7 @@ def packing(list, start, end, index, diff , myWords, myDates):
             j = 0
     file.close()
 
-def packNext(list, startValue,endValue,index, diff, myWords, myDates):
+def packNext(list, startValue,endValue,index, diff, myWords, myDates, myGarbage):
     baseDir = getcwd()
     for date in myDates:
         date.convertDoneInList()
@@ -200,7 +202,7 @@ def packNext(list, startValue,endValue,index, diff, myWords, myDates):
             for line in fileIn:
                 if flag2 == 0:
                     if flag == 0:
-                        buff = analyzeString(line[:-1], myWords, myDates)
+                        buff = analyzeString(line[:-1], myWords, myDates, myGarbage)
                         for word in buff:
                             if list[i] in word[0].done2:
                                 flag = 1
@@ -229,7 +231,7 @@ def packNext(list, startValue,endValue,index, diff, myWords, myDates):
     fileOut.close()
 
 
-def analyzeString(string, myWords, myDates):
+def analyzeString(string, myWords, myDates, myGarbage):
     for date in myDates:
         date.convertDoneInList()
     for word in myWords:
@@ -237,7 +239,7 @@ def analyzeString(string, myWords, myDates):
     res = []
     temp = []
     pos = 0
-    for word in myWords+myDates:
+    for word in myWords+myDates+myGarbage:
         for x in word.done2:
             if x in string:
                 temp.append([x,word])
