@@ -133,7 +133,6 @@ def processCombNext(list, rec, diff, myWords, myDates, myGarbage,nbProcess):
 
 def initList(list):
     baseDir = dirname(realpath(__file__))[:-len("/utils")]
-    print(baseDir)
     file = open(baseDir+"/buffer/000","w")
     for word in list:
         file.write(word+"\n")
@@ -180,7 +179,7 @@ def packing(list, start, end, index, diff , myWords, myDates, myGarbage):
     file.close()
 
 def packNext(list, startValue,endValue,index, diff, myWords, myDates, myGarbage):
-    baseDir =dirname(realpath(__file__))
+    baseDir =dirname(realpath(__file__))[:-len("/utils")]
     for date in myDates:
         date.convertDoneInList()
     for word in myWords:
@@ -238,24 +237,29 @@ def analyzeString(string, myWords, myDates, myGarbage):
     for word in myWords:
         word.done2 = word.done
     res = []
-    temp = []
     pos = 0
+    possibleWords = []
     for word in myWords+myDates+myGarbage:
-        for x in word.done2:
-            if x in string:
-                temp.append([x,word])
+        for possibility in word.done2:
+            if possibility in string:
+                possibleWords.append([possibility,word])
 
-    while temp != []: 
+
+    possibility = ["",None]
+    while possibleWords != []: 
         if string == "":
             break
-        for x in temp:
-            if string[len(x[0]):] == sub(escape(x[0]), '', string):
-                res.append([x[1],pos])
-                pos+=1
-                temp.remove(x)
-                string = string[len(x[0]):]
-                break
-        
+
+        for word in possibleWords:
+            if string[len(word[0]):] == sub(escape(word[0]), '', string):
+                if len(possibility[0]) < len(word[0]):
+                    possibility = word
+                
+        res.append([possibility[1],pos])
+        pos+=1
+        possibleWords.remove(possibility)
+        string = string[len(possibility[0]):]
+        possibility = ["", None]
     return res
 
 
