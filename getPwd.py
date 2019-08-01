@@ -52,10 +52,14 @@ if __name__=="__main__":
     ap.add_argument("-o", "--output", help="Output file", default = baseDir+"/output.list")
     ap.add_argument("-p", "--processes", help="Number of processes", default = 2)
     ap.add_argument("-d", "--difference", help="Don't combine two elements of one same set", action="store_true")
+    ap.add_argument("-l", "--leet", help="Use leet table instead of only Maj and Min.", action="store_true")
     args = vars(ap.parse_args())
 
     #loadCSV
-    dico = loadCsv(baseDir+"/csv/leetTab.csv",";")
+    if args["leet"]:
+        dico = loadCsv(baseDir+"/csv/leetTab.csv",";")
+    else:
+        dico = loadCsv(baseDir+"/csv/majMin.csv",";")
     dicoMonth = loadCsv(baseDir+"/csv/date.csv",";")
     dicoDepart = loadCsv(baseDir+"/csv/departements.csv", ";")
     try:

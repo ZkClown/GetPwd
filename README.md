@@ -29,9 +29,9 @@ The script is written in PYTHON 3
 ```
 git clone https://github.com/ZkClown/GetPwd.git
 cd ./GetPwd
-python genPwd.py -h
-usage: genPwd.py [-h] -f FILE [-r RECURENCE] [-b BRUTE] [-c CHARSET]
-                 [-o OUTPUT] [-p PROCESSES] [-d]
+python getPwd.py -h
+usage: getPwd.py [-h] -f FILE [-r RECURENCE] [-b BRUTE] [-c CHARSET]
+                 [-o OUTPUT] [-p PROCESSES] [-d] [-l LEET]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -47,6 +47,7 @@ optional arguments:
   -p PROCESSES, --processes PROCESSES
                         Number of processes
   -d, --difference      Don't combine two elements of one same set
+  -l, --leet            Use leet table instead of only Maj and Min
 ```
 ## Exemple usage 
 
