@@ -1,4 +1,4 @@
-# GetPwd
+# GetPwd --mr.robot
 
 ## Description
 It's a tool which generates a dictionary from a csv containing personal informations.
